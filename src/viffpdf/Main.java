@@ -1,8 +1,12 @@
 package viffpdf;
 
+import java.io.File;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -14,13 +18,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-	static TextField minPerPxlField;
 	static Rectangle dayHeaderColor = new Rectangle(20, 20);
 	static Rectangle backgroundColor = new Rectangle(20, 20);
 	static Rectangle venueColor = new Rectangle(20, 20);
+	static TextField minPerPxlField;
 	static TextField dayHeaderCode = new TextField();
 	static TextField backgroundCode = new TextField();
 	static TextField venueCode = new TextField();
@@ -31,17 +36,77 @@ public class Main extends Application {
 	static Text sectionStat;
 	static Text venueStat;
 	static Text screenTimeStat;
+	static TextArea logArea;
+	
+	static File colourTab;
+	static File sectionTab;
+	static File venueTab;
+	static File screenTimeTab;
 	
 	public void start(Stage primaryStage) {
+		final FileChooser fileChooser = new FileChooser();
 		//---
 		GridPane loaderGroup = new GridPane();
 		loaderGroup.setHgap(10);
 		loaderGroup.setVgap(10);
 		
 		Button loadColour = new Button("Colours");
+		loadColour.setOnAction(
+	            new EventHandler<ActionEvent>() {
+	                @Override
+	                public void handle(final ActionEvent e) {
+	                    File file = fileChooser.showOpenDialog(primaryStage);
+	                    if (file != null) {
+	                        colourTab = file;
+	                        status.print("Loading " + colourTab.toString() + "...");
+	                        colourStat.setText("Loaded!");
+	                        status.print("Successful!");
+	                    }
+	                }
+	            });
 		Button loadSection = new Button("Sections");
+		loadSection.setOnAction(
+	            new EventHandler<ActionEvent>() {
+	                @Override
+	                public void handle(final ActionEvent e) {
+	                    File file = fileChooser.showOpenDialog(primaryStage);
+	                    if (file != null) {
+	                        sectionTab = file;
+	                        status.print("Loading " + sectionTab.toString() + "...");
+	                        sectionStat.setText("Loaded!");
+	                        status.print("Successful!");
+	                    }
+	                }
+	            });
 		Button loadVenue = new Button("Venues");
+		loadVenue.setOnAction(
+	            new EventHandler<ActionEvent>() {
+	                @Override
+	                public void handle(final ActionEvent e) {
+	                    File file = fileChooser.showOpenDialog(primaryStage);
+	                    if (file != null) {
+	                        venueTab = file;
+	                        status.print("Loading " + venueTab.toString() + "...");
+	                        venueStat.setText("Loaded!");
+	                        status.print("Successful!");
+	                    }
+	                }
+	            });
 		Button loadScreenTime = new Button("Screen Times");
+		loadScreenTime.setOnAction(
+	            new EventHandler<ActionEvent>() {
+	                @Override
+	                public void handle(final ActionEvent e) {
+	                    File file = fileChooser.showOpenDialog(primaryStage);
+	                    if (file != null) {
+	                        screenTimeTab = file;
+	                        status.print("Loading " + screenTimeTab.toString() + "...");
+	                        screenTimeStat.setText("Loaded!");
+	                        status.print("Successful!");
+	                    }
+	                }
+	            });
+		
 		
 		Text loaderTitle = new Text("Input:");
 		loaderTitle.setStyle("-fx-font-weight: bold");
@@ -110,10 +175,10 @@ public class Main extends Application {
 		log.setVgap(10);
 		log.setHgap(10);
 		
-		Text logTitle = new Text("System Log: ");
+		Text logTitle = new Text("Status: ");
 		logTitle.setStyle("-fx-font-weight: bold");
 		
-		TextArea logArea = new TextArea();
+		logArea = new TextArea();
 		logArea.setEditable(false);
 		logArea.setPrefHeight(355);
 		logArea.setPrefWidth(450);
