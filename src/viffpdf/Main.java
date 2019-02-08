@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-	static Text minPerPxl;
+	static TextField minPerPxlField;
 	static Rectangle dayHeaderColor = new Rectangle(20, 20);
 	static Rectangle backgroundColor = new Rectangle(20, 20);
 	static Rectangle venueColor = new Rectangle(20, 20);
@@ -27,6 +27,10 @@ public class Main extends Application {
 	static Color dColor;
 	static Color bColor;
 	static Color vColor;
+	static Text colourStat;
+	static Text sectionStat;
+	static Text venueStat;
+	static Text screenTimeStat;
 	
 	public void start(Stage primaryStage) {
 		//---
@@ -41,10 +45,10 @@ public class Main extends Application {
 		
 		Text loaderTitle = new Text("Input:");
 		loaderTitle.setStyle("-fx-font-weight: bold");
-		Text colourStat = new Text("N/A");
-		Text sectionStat = new Text("N/A");
-		Text venueStat = new Text("N/A");
-		Text screenTimeStat = new Text("N/A");
+		colourStat = new Text("N/A");
+		sectionStat = new Text("N/A");
+		venueStat = new Text("N/A");
+		screenTimeStat = new Text("N/A");
 		
 		loaderGroup.add(loaderTitle, 1, 0);
 		loaderGroup.add(loadColour, 1, 1);
@@ -165,8 +169,8 @@ public class Main extends Application {
 		timeBlockConfig.setVgap(10);
 		Text timeBlockTitle = new Text("Block Config:");
 		timeBlockTitle.setStyle("-fx-font-weight: bold");
-		minPerPxl = new Text("Mins/Pixel");
-		TextField minPerPxlField = new TextField();
+		Text minPerPxl = new Text("Mins/Pixel");
+		minPerPxlField = new TextField();
 		minPerPxlField.setPrefWidth(50);
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
 		timeBlockConfig.add(minPerPxl, 0, 1);
