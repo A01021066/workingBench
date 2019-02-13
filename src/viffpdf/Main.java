@@ -1,6 +1,14 @@
 package viffpdf;
 
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -32,127 +40,205 @@ public class Main extends Application {
 	static Color dColor;
 	static Color bColor;
 	static Color vColor;
-	static Text colourStat;
+	static Text colorStat;
 	static Text sectionStat;
 	static Text venueStat;
 	static Text screenTimeStat;
 	static TextArea logArea;
-	
-	static File colourTab;
+
+	static File colorTab;
 	static File sectionTab;
 	static File venueTab;
 	static File screenTimeTab;
-	
-	public void start(Stage primaryStage) {
+	private ArrayList<Button> fileTypes = new ArrayList<Button>(4);
+	private ArrayList<Parser> parsers = new ArrayList<Parser>(4);
+	private ArrayList<Text> fileStats = new ArrayList<Text>(4);
+	private static final int SECTIONS = 0;
+	private static final int COLORS = 1;
+	private static final int VENUES = 2;
+	private static final int SCREEN_TIMES = 3;
+	/**
+	 * Opens a file and passes it to the corresponding parser.
+	 */
+	public void loaderButton(ActionEvent event, Stage primaryStage) {
 		final FileChooser fileChooser = new FileChooser();
-		//---
+		File file = fileChooser.showOpenDialog(primaryStage);
+		if (file != null) {
+
+		// Opens a file for parsing
+			int fileType = fileTypes.indexOf(event.getSource());
+			System.out.println(fileType);
+
+			Status.print("Opening: " + file.getAbsolutePath());
+
+			try {
+				Parser parser = parsers.get(fileType);
+
+				Status.print("Loading: " + parser.getFileType());
+				Status.print(parser.setData(file) + parser.getFileType() + " file opened properly!");
+				System.out.println(fileStats.get(fileType));
+				fileStats.get(fileType).setText("Passed");
+			} catch (FileNotFoundException e) {
+				Status.print("File Not Found.  Details:");
+				Status.print(e.getMessage());
+				fileStats.get(fileType).setText("Failed");
+			} catch (IllegalArgumentException e) {
+				Status.print("File Not Valid.  Details:");
+				Status.print(e.getMessage());
+				fileStats.get(fileType).setText("Failed");
+			} finally {
+				//fOpenPns.get(fileType).setText(file.getName());
+			}
+		
+			// Cancels file opening.
+		} else {
+			Status.print("File Open Cancelled.");
+		}
+
+	}
+
+	public void start(Stage primaryStage) {
+
+		//parsers.add(SECTIONS, new SectionData());
+		parsers.add(SECTIONS, new ColorParser());
+		parsers.add(COLORS, new ColorParser());
+		parsers.add(VENUES, new ColorParser());
+		parsers.add(SCREEN_TIMES, new ColorParser());
+		//parsers.add(VENUES, new VenueTab());
+		//parsers.add(SCREEN_TIMES, new ScreenTimesTab());
+		
+
+		// ---Loaders
+		//
 		GridPane loaderGroup = new GridPane();
 		loaderGroup.setHgap(10);
 		loaderGroup.setVgap(10);
-		
-		Button loadColour = new Button("Colours");
-		loadColour.setOnAction(
-	            new EventHandler<ActionEvent>() {
-	                @Override
-	                public void handle(final ActionEvent e) {
-	                    File file = fileChooser.showOpenDialog(primaryStage);
-	                    if (file != null) {
-	                        colourTab = file;
-	                        status.print("Loading " + colourTab.toString() + "...");
-	                        colourStat.setText("Loaded!");
-	                        status.print("Successful!");
-	                    }
-	                }
-	            });
+
+		Button loadColor = new Button("Colors");
+
+		loadColor.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	loaderButton(e, primaryStage);
+            }
+            });
 		Button loadSection = new Button("Sections");
-		loadSection.setOnAction(
-	            new EventHandler<ActionEvent>() {
-	                @Override
-	                public void handle(final ActionEvent e) {
-	                    File file = fileChooser.showOpenDialog(primaryStage);
-	                    if (file != null) {
-	                        sectionTab = file;
-	                        status.print("Loading " + sectionTab.toString() + "...");
-	                        sectionStat.setText("Loaded!");
-	                        status.print("Successful!");
-	                    }
-	                }
-	            });
+
+
 		Button loadVenue = new Button("Venues");
-		loadVenue.setOnAction(
-	            new EventHandler<ActionEvent>() {
-	                @Override
-	                public void handle(final ActionEvent e) {
-	                    File file = fileChooser.showOpenDialog(primaryStage);
-	                    if (file != null) {
-	                        venueTab = file;
-	                        status.print("Loading " + venueTab.toString() + "...");
-	                        venueStat.setText("Loaded!");
-	                        status.print("Successful!");
-	                    }
-	                }
-	            });
+
+		//loadVenue.setOnAction(new EventHandler<ActionEvent>() {
+
 		Button loadScreenTime = new Button("Screen Times");
-		loadScreenTime.setOnAction(
-	            new EventHandler<ActionEvent>() {
-	                @Override
-	                public void handle(final ActionEvent e) {
-	                    File file = fileChooser.showOpenDialog(primaryStage);
-	                    if (file != null) {
-	                        screenTimeTab = file;
-	                        status.print("Loading " + screenTimeTab.toString() + "...");
-	                        screenTimeStat.setText("Loaded!");
-	                        status.print("Successful!");
-	                    }
-	                }
-	            });
+
+		//loadScreenTime.setOnAction(new EventHandler<ActionEvent>() {
 		
-		
-		Text loaderTitle = new Text("Input:");
+		fileTypes.add(loadSection);
+		fileTypes.add(loadColor);
+		fileTypes.add(loadVenue);
+		fileTypes.add(loadScreenTime);
+
+		Text loaderTitle;
+		loaderTitle = new Text("Input:");
 		loaderTitle.setStyle("-fx-font-weight: bold");
-		colourStat = new Text("N/A");
+		colorStat = new Text("N/A");
 		sectionStat = new Text("N/A");
 		venueStat = new Text("N/A");
 		screenTimeStat = new Text("N/A");
-		
+		fileStats.add(SECTIONS, sectionStat);
+		fileStats.add(COLORS, colorStat);
+		fileStats.add(VENUES, venueStat);
+		fileStats.add(SCREEN_TIMES, screenTimeStat);
+
 		loaderGroup.add(loaderTitle, 1, 0);
-		loaderGroup.add(loadColour, 1, 1);
-		loaderGroup.add(colourStat, 1, 2);
+		loaderGroup.add(loadColor, 1, 1);
+		loaderGroup.add(colorStat, 1, 2);
 		loaderGroup.add(loadSection, 2, 1);
 		loaderGroup.add(sectionStat, 2, 2);
 		loaderGroup.add(loadVenue, 3, 1);
 		loaderGroup.add(venueStat, 3, 2);
 		loaderGroup.add(loadScreenTime, 4, 1);
 		loaderGroup.add(screenTimeStat, 4, 2);
-		
-		GridPane.setHalignment(colourStat, HPos.CENTER);
+
+		GridPane.setHalignment(colorStat, HPos.CENTER);
 		GridPane.setHalignment(sectionStat, HPos.CENTER);
 		GridPane.setHalignment(venueStat, HPos.CENTER);
 		GridPane.setHalignment(screenTimeStat, HPos.CENTER);
-		
-		
-		//---
+
+		// ---Color configurations
+		// ---
 		GridPane theme = new GridPane();
 		theme.setVgap(10);
 		theme.setHgap(5);
-		
+
 		Text themeTitle = new Text("Color Config:");
 		themeTitle.setStyle("-fx-font-weight: bold");
 		Text dayHeader = new Text("Day Header");
 		Text background = new Text("Background");
 		Text venue = new Text("Venue");
-		
 
 		Button dayHeaderCheck = new Button("?");
+		dayHeaderCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = dayHeaderCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				dColor = Color.rgb(r, g, b);
+				dayHeaderColor.setFill(dColor);
+			}
+		});
 		Button backgroundCheck = new Button("?");
+		backgroundCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = backgroundCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				bColor = Color.rgb(r, g, b);
+				backgroundColor.setFill(bColor);
+			}
+		});
 		Button venueCheck = new Button("?");
-		
+		venueCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = venueCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				vColor = Color.rgb(r, g, b);
+				venueColor.setFill(vColor);
+			}
+		});
 
-		dColor = Color.rgb(255,165,0);
+		dColor = Color.rgb(255, 165, 0);
 		dayHeaderColor.setFill(dColor);// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html
-		bColor = Color.rgb(0,0,0); // https://www.rapidtables.com/convert/color/rgb-to-cmyk.html
+		bColor = Color.rgb(0, 0, 0); // https://www.rapidtables.com/convert/color/rgb-to-cmyk.html
 		backgroundColor.setFill(bColor);
-		vColor = Color.rgb(255,165,0); //https://www.rapidtables.com/convert/color/cmyk-to-rgb.html
+		vColor = Color.rgb(255, 165, 0); // https://www.rapidtables.com/convert/color/cmyk-to-rgb.html
 		venueColor.setFill(vColor);
 
 		theme.add(themeTitle, 0, 0);
@@ -168,67 +254,58 @@ public class Main extends Application {
 		theme.add(dayHeaderColor, 3, 1);
 		theme.add(backgroundColor, 3, 2);
 		theme.add(venueColor, 3, 3);
-		
-		
-		//---
+
+		// ---
 		GridPane log = new GridPane();
 		log.setVgap(10);
 		log.setHgap(10);
-		
+
 		Text logTitle = new Text("Status: ");
 		logTitle.setStyle("-fx-font-weight: bold");
-		
+
 		logArea = new TextArea();
 		logArea.setEditable(false);
 		logArea.setPrefHeight(355);
 		logArea.setPrefWidth(450);
-		
+
 		log.add(logTitle, 1, 0);
 		log.add(logArea, 1, 1);
-		
-		
-		//---
+
+		// ---Font configurations
+		// ---
 		GridPane fontConfig = new GridPane();
 		fontConfig.setHgap(10);
 		fontConfig.setVgap(10);
-		
+
 		Text fontTitle = new Text("Font Config:");
 		fontTitle.setStyle("-fx-font-weight: bold");
-		
+
 		Text fontFace = new Text("Font");
-		ObservableList<String> fonts = FXCollections.observableArrayList(
-			        "Times New Roman",
-			        "Comic Sans",
-			        "Fonts"
-			    );
+		ObservableList<String> fonts = FXCollections.observableArrayList("Times New Roman", "Comic Sans", "Fonts");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
-		
+
 		Text fontSize = new Text("Size");
-		ObservableList<Integer> sizes = FXCollections.observableArrayList(
-			        6,
-			        8,
-			        10
-			    );
-		final ComboBox<Integer> sizeBox = new ComboBox<Integer>(sizes); //only applies to the screen time blocks
-		//other font sizes are fixed for printing purpose.
-		
+		ObservableList<Integer> sizes = FXCollections.observableArrayList(6, 8, 10);
+		final ComboBox<Integer> sizeBox = new ComboBox<Integer>(sizes); // only applies to the screen time blocks
+		// other font sizes are fixed for printing purpose.
+
 		sizeBox.setPrefWidth(50);
 		fontConfig.add(fontTitle, 0, 0);
 		fontConfig.add(fontFace, 0, 1);
 		fontConfig.add(fontBox, 1, 1);
 		fontConfig.add(fontSize, 0, 2);
 		fontConfig.add(sizeBox, 1, 2);
-		
-		
+
 		//
-		
-		//---
+
+		// ---Output buttons
+		// ---
 		GridPane outPutGroup = new GridPane();
 		Button export = new Button("Generate");
 		outPutGroup.add(export, 0, 0);
-		
-		
-		//---
+
+		// ---Time block configurations
+		// ---
 		GridPane timeBlockConfig = new GridPane();
 		timeBlockConfig.setHgap(10);
 		timeBlockConfig.setVgap(10);
@@ -240,8 +317,8 @@ public class Main extends Application {
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
 		timeBlockConfig.add(minPerPxl, 0, 1);
 		timeBlockConfig.add(minPerPxlField, 1, 1);
-		
-		//---
+
+		// ---
 		try {
 			Group root = new Group();
 
@@ -251,8 +328,8 @@ public class Main extends Application {
 			root.getChildren().add(fontConfig);
 			root.getChildren().add(outPutGroup);
 			root.getChildren().add(timeBlockConfig);
-			
-			Scene scene = new Scene(root, 1000,500);
+
+			Scene scene = new Scene(root, 1000, 500);
 			loaderGroup.setLayoutX(10);
 			loaderGroup.setLayoutY(10);
 			log.setLayoutX(10);
@@ -265,7 +342,7 @@ public class Main extends Application {
 			outPutGroup.setLayoutY(scene.getHeight() - 40);
 			timeBlockConfig.setLayoutX(scene.getWidth() - 400);
 			timeBlockConfig.setLayoutY(scene.getHeight() - 230);
-		    primaryStage.setResizable(false);
+			primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");
 			primaryStage.show();
@@ -273,7 +350,7 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
