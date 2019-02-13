@@ -1,14 +1,10 @@
 package viffpdf;
 
-import java.awt.event.ActionListener;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
