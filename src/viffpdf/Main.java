@@ -95,15 +95,10 @@ public class Main extends Application {
 
 	public void start(Stage primaryStage) {
 
-		//parsers.add(SECTIONS, new SectionData());
-		parsers.add(SECTIONS, new ColorParser());
+		parsers.add(SECTIONS, new SectionParser());
 		parsers.add(COLORS, new ColorParser());
-		parsers.add(VENUES, new ColorParser());
-		parsers.add(SCREEN_TIMES, new ColorParser());
-		//parsers.add(VENUES, new VenueTab());
-		//parsers.add(SCREEN_TIMES, new ScreenTimesTab());
-		
-
+		parsers.add(VENUES, new VenueParser());
+		parsers.add(SCREEN_TIMES, new ScreenTimeParser());
 		// ---Loaders
 		//
 		GridPane loaderGroup = new GridPane();
@@ -111,22 +106,33 @@ public class Main extends Application {
 		loaderGroup.setVgap(10);
 
 		Button loadColor = new Button("Colors");
-
 		loadColor.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
             	loaderButton(e, primaryStage);
             }
             });
+		
 		Button loadSection = new Button("Sections");
-
+		loadSection.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	loaderButton(e, primaryStage);
+            }
+            });
 
 		Button loadVenue = new Button("Venues");
-
-		//loadVenue.setOnAction(new EventHandler<ActionEvent>() {
+		loadVenue.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	loaderButton(e, primaryStage);
+            }
+            });
+		
 
 		Button loadScreenTime = new Button("Screen Times");
-
-		//loadScreenTime.setOnAction(new EventHandler<ActionEvent>() {
+		loadScreenTime.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	loaderButton(e, primaryStage);
+            }
+            });
 		
 		fileTypes.add(loadSection);
 		fileTypes.add(loadColor);
@@ -172,6 +178,8 @@ public class Main extends Application {
 		Text background = new Text("Background");
 		Text venue = new Text("Venue");
 
+		// -- Color preview algorithm
+		// cmyk to rgb
 		Button dayHeaderCheck = new Button("?");
 		dayHeaderCheck.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
