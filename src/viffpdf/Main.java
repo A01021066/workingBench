@@ -1,10 +1,13 @@
 package viffpdf;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -16,13 +19,18 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -41,11 +49,19 @@ public class Main extends Application {
 	static Text venueStat;
 	static Text screenTimeStat;
 	static TextArea logArea;
+	static RadioButton checkEmpty;
 
 	static File colorTab;
 	static File sectionTab;
 	static File venueTab;
 	static File screenTimeTab;
+	static int[] pageLayoutSetting = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	static boolean[] emptyRowSetting = { false, false, false, false, false, false, false, false };
+	ArrayList<VenueTable> VTList = new ArrayList<VenueTable>();
+	ArrayList<VenueDateTable> VDTList = new ArrayList<VenueDateTable>();
+	ArrayList<DayTable> DList = new ArrayList<DayTable>();
+	ArrayList<PageTable> PList = new ArrayList<PageTable>();
+	ArrayList<Date> dateList = new ArrayList<Date>();
 	private ArrayList<Button> fileTypes = new ArrayList<Button>(4);
 	private ArrayList<Parser> parsers = new ArrayList<Parser>(4);
 	private ArrayList<Text> fileStats = new ArrayList<Text>(4);
@@ -53,6 +69,7 @@ public class Main extends Application {
 	private static final int COLORS = 1;
 	private static final int VENUES = 2;
 	private static final int SCREEN_TIMES = 3;
+
 	/**
 	 * Opens a file and passes it to the corresponding parser.
 	 */
@@ -61,9 +78,8 @@ public class Main extends Application {
 		File file = fileChooser.showOpenDialog(primaryStage);
 		if (file != null) {
 
-		// Opens a file for parsing
+			// Opens a file for parsing
 			int fileType = fileTypes.indexOf(event.getSource());
-			System.out.println(fileType);
 
 			Status.print("Opening: " + file.getAbsolutePath());
 
@@ -72,7 +88,6 @@ public class Main extends Application {
 
 				Status.print("Loading: " + parser.getFileType());
 				Status.print(parser.setData(file) + parser.getFileType() + " file opened properly!");
-				System.out.println(fileStats.get(fileType));
 				fileStats.get(fileType).setText("Passed");
 			} catch (FileNotFoundException e) {
 				Status.print("File Not Found.  Details:");
@@ -83,13 +98,91 @@ public class Main extends Application {
 				Status.print(e.getMessage());
 				fileStats.get(fileType).setText("Failed");
 			} finally {
-				//fOpenPns.get(fileType).setText(file.getName());
+				// fOpenPns.get(fileType).setText(file.getName());
 			}
-		
+
 			// Cancels file opening.
 		} else {
 			Status.print("File Open Cancelled.");
 		}
+
+	}
+
+	public static void pageSettingUI(Stage primaryStage) {
+		GridPane pageSettingLayOut = new GridPane();
+		pageSettingLayOut.setHgap(10);
+		pageSettingLayOut.setVgap(10);
+		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 350);
+		Text pageNumberText = new Text("Page#");
+		pageNumberText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+		Text daysPerPageText = new Text("Days/Page");
+		daysPerPageText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+		Text emptyRowText = new Text("Clear Empty Venue");
+		emptyRowText.setFont(Font.font("Verdana", FontWeight.BOLD, 10));
+		pageSettingLayOut.add(emptyRowText, 8, 1);
+		pageSettingLayOut.add(daysPerPageText, 6, 1);
+		pageSettingLayOut.add(pageNumberText, 1, 1);
+		for (int i = 2; i < 10; i++) {
+			Text text = new Text("Page " + (i - 1));
+			text.setTextAlignment(TextAlignment.CENTER);
+			pageSettingLayOut.add(text, 1, i);
+		}
+		ArrayList<NumField> daysPerPageInput = new ArrayList<NumField>();
+		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
+		for (int n = 2; n < 10; n++) {
+			NumField textField = new NumField();
+			textField.setText("0");
+			textField.setId(varNames[n - 2]);
+			pageSettingLayOut.add(textField, 6, n);
+			daysPerPageInput.add(textField);
+		}
+
+		ArrayList<RadioButton> emptyRows = new ArrayList<RadioButton>();
+		String[] radioNames = { "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" };
+		for (int n = 2; n < 10; n++) {
+			RadioButton radio = new RadioButton();
+			radio.setId(radioNames[n - 2]);
+			pageSettingLayOut.add(radio, 8, n);
+			emptyRows.add(radio);
+		}
+
+		Button applyPageSetting = new Button("Apply");
+		applyPageSetting.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				Status.print("Applying days/page setting...");
+				for (NumField n : daysPerPageInput) {
+					if (n.getText().isEmpty()) {
+						n.setText("0");
+					}
+					pageLayoutSetting[daysPerPageInput.indexOf(n)] = Integer.parseInt(n.getText());
+				}
+
+				for (RadioButton r : emptyRows) {
+					emptyRowSetting[emptyRows.indexOf(r)] = r.isSelected();
+				}
+				Status.print("Days/page setting successfully applied.");
+				int counter = 1;
+				for (int num : pageLayoutSetting) {
+					if (num > 0) {
+						Status.print("Days on page " + counter + ": " + num);
+					}
+					counter++;
+				}
+				Stage stage = (Stage) applyPageSetting.getScene().getWindow();
+				stage.hide();
+			}
+		});
+		pageSettingLayOut.add(applyPageSetting, 6, 11);
+
+		Stage pageSettingWindow = new Stage();
+		pageSettingWindow.setTitle("Page Setting");
+		pageSettingWindow.setResizable(false);
+		pageSettingWindow.setScene(pageSettingScene);
+		pageSettingWindow.setX(primaryStage.getX() + 50);
+		pageSettingWindow.setY(primaryStage.getY() + 10);
+		pageSettingWindow.initModality(Modality.APPLICATION_MODAL);
+		pageSettingWindow.show();
 
 	}
 
@@ -107,33 +200,37 @@ public class Main extends Application {
 
 		Button loadColor = new Button("Colors");
 		loadColor.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-            	loaderButton(e, primaryStage);
-            }
-            });
-		
+			@Override
+			public void handle(ActionEvent e) {
+				loaderButton(e, primaryStage);
+			}
+		});
+
 		Button loadSection = new Button("Sections");
 		loadSection.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-            	loaderButton(e, primaryStage);
-            }
-            });
+			@Override
+			public void handle(ActionEvent e) {
+				loaderButton(e, primaryStage);
+			}
+		});
 
 		Button loadVenue = new Button("Venues");
 		loadVenue.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-            	loaderButton(e, primaryStage);
-            }
-            });
-		
+			@Override
+			public void handle(ActionEvent e) {
+				loaderButton(e, primaryStage);
+			}
+		});
 
 		Button loadScreenTime = new Button("Screen Times");
 		loadScreenTime.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-            	loaderButton(e, primaryStage);
-            }
-            });
-		
+			@Override
+			public void handle(ActionEvent e) {
+				loaderButton(e, primaryStage);
+
+			}
+		});
+
 		fileTypes.add(loadSection);
 		fileTypes.add(loadColor);
 		fileTypes.add(loadVenue);
@@ -306,7 +403,126 @@ public class Main extends Application {
 		// ---
 		GridPane outPutGroup = new GridPane();
 		Button export = new Button("Generate");
+		export.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				/**
+				 * Bound all of these to the generate button or buffer button These are all test
+				 * cases.
+				 */
+
+				// get the Venue datas from the VenueParser.
+				HashMap<String, VenueData> venueList = ((VenueParser) parsers.get(2)).getVenueList();
+				// we need the iterator.
+				Iterator it = venueList.entrySet().iterator();
+
+				while (it.hasNext()) {
+					// get each specific venue data entry
+					Map.Entry<String, VenueData> entry = (Map.Entry<String, VenueData>) it.next();
+					// get the venue object
+					VenueData venue = entry.getValue();
+					// arrange each venue object with their screen times.
+					VenueTable tableEntry = new VenueTable(venue, (ScreenTimeParser) parsers.get(3));
+					// add these venue+sct object into the list.
+					VTList.add(tableEntry);
+				}
+
+				// create a date list for our references.
+				for (VenueTable v : VTList) {
+					for (ScreenTimeData s : v.thisTimeBlocks) {
+						if (!dateList.contains(s.getDate())) {
+							dateList.add(s.getDate());
+						}
+					}
+				}
+				// sort the dates
+				Collections.sort(dateList);
+
+				// for each venue we have, for each day we have.
+				for (VenueTable vt : VTList) {
+					for (Date d : dateList) {
+						// create an VDT object that contains:
+						// a specific venue(unique to object)
+						// a specific date(unique to object)
+						// an arraylist of sct data(all of the movies shown on this venue at this date)
+						VenueDateTable vdtEntry = new VenueDateTable(vt, d, 20);
+						if (checkEmpty.isSelected()) {
+							if (!vdtEntry.thisVDT.isEmpty()) {
+								VDTList.add(vdtEntry);
+							}
+						} else {
+							VDTList.add(vdtEntry);
+						}
+
+					}
+				}
+
+				// for each day
+				for (Date day : dateList) {
+					// create a dayTable object that contains:
+					// a date(unique to object)
+					// an arrayList of VDTs
+					DayTable temp = new DayTable(VDTList, day);
+					DList.add(temp);
+				}
+				int c = 1;
+				int dayCounter = 0;
+				for (int i : pageLayoutSetting) {
+					if (i > 0 && dayCounter < DList.size()) {
+						PageTable pTable = new PageTable(DList, i, c++);
+						PList.add(pTable);
+						dayCounter += pTable.numOfDays;
+						Status.print(dayCounter + " days successfully allocated.");
+
+					}
+				}
+				if (dayCounter <= dateList.size()) {
+					int leftOver = dateList.size() - dayCounter;
+					Status.print("After formatting, you have " + leftOver + " days left unallocated.");
+					int leftOverHeight = 0;
+					for (int l = DList.size() - leftOver; l < DList.size(); l++) {
+						leftOverHeight += DList.get(l).thisHeight;
+						Status.print(DList.get(l).dayDate + "");
+						Status.print(leftOverHeight + "");
+					}
+					try {
+						int leftOverPage = (int) Math.ceil(leftOverHeight / PList.get(0).maxHeight);
+						Status.print("It will take approximately " + leftOverPage
+								+ " more pages to fill in all of the days.");
+					} catch (IndexOutOfBoundsException empty) {
+						Status.print("Please update your page setting.");
+					}
+				}
+
+				for (PageTable pT : PList) {
+					System.out.println(pT);
+				}
+
+				PageTable.dayCount = 0;
+				PageTable.pageCount = 1;
+				DayTable.count = 0;
+				VTList = new ArrayList<VenueTable>();
+				VDTList = new ArrayList<VenueDateTable>();
+				DList = new ArrayList<DayTable>();
+				PList = new ArrayList<PageTable>();
+				dateList = new ArrayList<Date>();
+			}
+		});
+
+		//// Page Setting UI
+		Button pageSetting = new Button("Page Setting");
+		pageSetting.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				pageSettingUI(primaryStage);
+			}
+		});
+		/////
 		outPutGroup.add(export, 0, 0);
+		outPutGroup.add(pageSetting, 1, 0);
 
 		// ---Time block configurations
 		// ---
@@ -318,6 +534,8 @@ public class Main extends Application {
 		Text minPerPxl = new Text("Mins/Pixel");
 		minPerPxlField = new TextField();
 		minPerPxlField.setPrefWidth(50);
+		checkEmpty = new RadioButton("Clear Empty Rows");
+		timeBlockConfig.add(checkEmpty, 0, 2);
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
 		timeBlockConfig.add(minPerPxl, 0, 1);
 		timeBlockConfig.add(minPerPxlField, 1, 1);
