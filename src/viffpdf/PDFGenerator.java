@@ -194,7 +194,8 @@ public class PDFGenerator {
 			schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
 		}
 
-//////      Trying to add blank rows here...	
+//////      Trying to add blank rows here...
+//////     
 //		Table venSched = new Table(tableCellNumbers).useAllAvailableWidth();
 //		for (int i = 0; i < 4; i++) {
 //		    Color c;
