@@ -17,14 +17,12 @@ import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.*;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
-import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
@@ -179,25 +177,68 @@ public class PDFGenerator {
 		// Initialize table with 1080 cells across
 		Table schedule_table = new Table(tableCellNumbers);
 
-		schedule_table.setWidth(300).setTextAlignment(TextAlignment.CENTER)
+		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
 				.setMarginTop(TABLE_MARGIN);
 		schedule_table.setHeight(30);
-		//schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
+		schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
 		Cell cell;
-		cell = new Cell(1, number_of_columns).setBackgroundColor(WebColors.getRGBColor("BLACK")).setPadding(0);
+//		cell = new Cell(1, number_of_columns).setBackgroundColor(WebColors.getRGBColor("BLACK")).setPadding(0);
+//		schedule_table.addHeaderCell(cell);
+		
+		cell = new Cell(1, HOUR * 2).setBackgroundColor(ColorConstants.BLACK).setPadding(0);
 		schedule_table.addHeaderCell(cell);
 		
-		cell = new Cell(1, HOUR * 2).setBackgroundColor(WebColors.getRGBColor("WHITE")).setPadding(0);
-		Text text = new Text("Day " + (++dayCounter));
-		cell.getChildren().add(text);
-		schedule_table.addHeaderCell(cell);
 		for (int i = 0; i < listOfTimes.size(); i++)
 		{
-			//schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
+			schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
 		}
 
+//////      Trying to add blank rows here...	
+//		Table venSched = new Table(tableCellNumbers).useAllAvailableWidth();
+//		for (int i = 0; i < 4; i++) {
+//		    Color c;
+//		    c = (i%2 == 0) ? ColorConstants.DARK_GRAY : ColorConstants.GRAY; 
+//		    cell = new Cell(1, number_of_columns).setBackgroundColor(c).setHeight(10);
+//		    Paragraph para = new Paragraph("VENUE SCHEDULE HERE").setFontColor(ColorConstants.YELLOW);
+//		    cell.add(para);
+//		    venSched.addCell(cell);
+//	        schedule_table.addCell(venSched); 
+//		}
+		
 //		
 		return schedule_table;
 	}
+	
+	   /**
+     * Creates a type of cell that contains the date
+     * 
+     * @author Steven Ma 
+     */
+    private Cell createDateCell(int cellWidth, String date)
+    {
+        Cell cell = new Cell(1, cellWidth);
+        cell.add(new Paragraph(date).setFontSize(DATE_FONT_SIZE).setBold().setFontColor(ColorConstants.WHITE)); //Color changed to ColorConstants
+        cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(224, 168, 56)).setPadding(0)
+                .setPaddingLeft(5);
+        return cell;
+    }
+    
+    /**
+     * Creates a type of cell that contains the schedule times
+     * 
+     * @author Steven Ma
+     *
+     */
+    private Cell createTimeCell(String time)
+    {
+        Cell cell = new Cell(1, HOUR);
+//        cell.setBorder(Border.NO_BORDER);
+        cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(0).setBold().setFontColor(ColorConstants.WHITE) 
+                .setBackgroundColor(ColorConstants.BLACK); //Color changed to ColorConstants
+        return cell;
+    }
 }
+
+
+

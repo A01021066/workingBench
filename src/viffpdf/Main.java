@@ -115,7 +115,7 @@ public class Main extends Application {
 		GridPane pageSettingLayOut = new GridPane();
 		pageSettingLayOut.setHgap(10);
 		pageSettingLayOut.setVgap(10);
-		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 350);
+		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 400);
 		Text pageNumberText = new Text("Page#");
 		pageNumberText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 		Text daysPerPageText = new Text("Days/Page");
@@ -134,7 +134,8 @@ public class Main extends Application {
 		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
 		for (int n = 2; n < 10; n++) {
 			NumField textField = new NumField();
-			textField.setText("0");
+			String defTxt = (n<6)? "4": "0";
+			textField.setText(defTxt);
 			textField.setId(varNames[n - 2]);
 			pageSettingLayOut.add(textField, 6, n);
 			daysPerPageInput.add(textField);
