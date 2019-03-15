@@ -2,12 +2,14 @@ package viffpdf;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -69,6 +71,7 @@ public class Main extends Application {
 	private static final int COLORS = 1;
 	private static final int VENUES = 2;
 	private static final int SCREEN_TIMES = 3;
+	
 
 	/**
 	 * Opens a file and passes it to the corresponding parser.
@@ -498,6 +501,13 @@ public class Main extends Application {
 
 				for (PageTable pT : PList) {
 					System.out.println(pT);
+				}
+				
+				try {
+					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "viff-pdf", PList);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 				PageTable.dayCount = 0;
