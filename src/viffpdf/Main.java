@@ -410,7 +410,6 @@ public class Main extends Application {
 
 			@Override
 			public void handle(ActionEvent event) {
-				// TODO Auto-generated method stub
 				/**
 				 * Bound all of these to the generate button or buffer button These are all test
 				 * cases.
@@ -419,7 +418,7 @@ public class Main extends Application {
 				// get the Venue datas from the VenueParser.
 				HashMap<String, VenueData> venueList = ((VenueParser) parsers.get(2)).getVenueList();
 				// we need the iterator.
-				Iterator it = venueList.entrySet().iterator();
+				Iterator<Map.Entry<String, VenueData>> it = venueList.entrySet().iterator();
 
 				while (it.hasNext()) {
 					// get each specific venue data entry
@@ -499,12 +498,10 @@ public class Main extends Application {
 					}
 				}
 
-				for (PageTable pT : PList) {
-					System.out.println(pT);
-				}
+				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList);
 				
 				try {
-					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "viff-pdf", PList);
+					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString(), table);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

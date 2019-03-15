@@ -17,7 +17,7 @@ public class NumField extends TextField {
 	            char ar[] = t.getCharacter().toCharArray();
 	            char ch = ar[t.getCharacter().toCharArray().length - 1];
 	            if (!(ch >= '0' && ch <= '9')) {
-	               System.out.println("The char you entered is not a number");
+	               //System.out.println("The char you entered is not a number");
 	               t.consume();
 	            }
 	         }

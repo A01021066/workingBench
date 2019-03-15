@@ -37,7 +37,7 @@ import com.itextpdf.layout.property.TextAlignment;
 public class PDFGenerator {
 	String destPath;
 
-	ArrayList<PageTable> PageList = new ArrayList<PageTable>();
+	AllTable table;
 	private static int dayCounter = 0;
 	// Used to specify the amount of cells in a row and the weight of each cell
 	private float[] tableCellNumbers;
@@ -90,11 +90,11 @@ public class PDFGenerator {
 	 */
 	private static final int TIME_FONT_SIZE = 7;
 
-	public PDFGenerator(String dest, ArrayList<PageTable> PList) throws IOException {
+	public PDFGenerator(String dest, AllTable table) throws IOException {
 		setDest(dest);
 		File file = new File(dest);
 		file.getParentFile().mkdirs();
-		PageList = PList;
+		this.table = table;
 		generate();
 	}
 
@@ -111,14 +111,17 @@ public class PDFGenerator {
 		PdfWriter writer = new PdfWriter(destPath);
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
-		Document document = new Document(pdf, new PageSize(651, 736).rotate());
+		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT));
 
-		SimpleDateFormat fmt = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd");
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
 		Arrays.fill(tableCellNumbers, 1.0f);
-		for (PageTable pt : PageList) {
+		for (PageTable pt : table.PList) {
 			for (int i = 0; i < pt.numOfDays; i++) {
-				document.add(createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate)));
+				Table day = createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate));
+				day.setHeight(pt.dayList.get(i).thisHeight);
+				System.out.println(pt.dayList.get(i));
+				document.add(day);
 			}
 		}
 		dayCounter = 0;
@@ -177,25 +180,26 @@ public class PDFGenerator {
 		listOfTimes.add("01:00");
 
 		// Initialize table with 1080 cells across
+		
 		Table schedule_table = new Table(tableCellNumbers);
 
-		schedule_table.setWidth(300).setTextAlignment(TextAlignment.CENTER)
-				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
-				.setMarginTop(TABLE_MARGIN);
-		schedule_table.setHeight(30);
+		schedule_table.setWidth(PAGE_WIDTH).setTextAlignment(TextAlignment.LEFT)
+				.setHorizontalAlignment(HorizontalAlignment.LEFT).setBackgroundColor(WebColors.getRGBColor("WHITE"))
+				/*.setMarginTop(TABLE_MARGIN)*/;
+
 		//schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
 		Cell cell;
-		cell = new Cell(1, number_of_columns).setBackgroundColor(WebColors.getRGBColor("BLACK")).setPadding(0);
-		schedule_table.addHeaderCell(cell);
-		
-		cell = new Cell(1, HOUR * 2).setBackgroundColor(WebColors.getRGBColor("WHITE")).setPadding(0);
-		Text text = new Text("Day " + (++dayCounter));
+//		cell = new Cell(1, number_of_columns).setBackgroundColor(WebColors.getRGBColor("BLACK")).setPadding(0);
+//		schedule_table.addHeaderCell(cell);
+//		
+		cell = new Cell(1, 1).setBackgroundColor(WebColors.getRGBColor("WHITE")).setPadding(0);
+		Text text = new Text(date);
 		cell.getChildren().add(text);
 		schedule_table.addHeaderCell(cell);
-		for (int i = 0; i < listOfTimes.size(); i++)
-		{
-			//schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
-		}
+//		for (int i = 0; i < listOfTimes.size(); i++)
+//		{
+//			//schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
+//		}
 
 //		
 		return schedule_table;

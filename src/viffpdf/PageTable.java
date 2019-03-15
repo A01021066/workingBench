@@ -6,7 +6,7 @@ public class PageTable {
 	static int dayCount = 0;
 	static int pageCount = 1;
 	int numOfDays = 0;
-	final int maxHeight = 2000;
+	final int maxHeight = 736;
 	int thisHeight = 0;
 	int pageNum;
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
