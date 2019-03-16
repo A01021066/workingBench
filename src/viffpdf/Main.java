@@ -26,6 +26,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import com.itextpdf.kernel.colors.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -43,9 +44,12 @@ public class Main extends Application {
 	static TextField dayHeaderCode = new TextField();
 	static TextField backgroundCode = new TextField();
 	static TextField venueCode = new TextField();
-	static Color dColor;
-	static Color bColor;
-	static Color vColor;
+	static javafx.scene.paint.Color dColor;
+	static javafx.scene.paint.Color bColor;
+	static javafx.scene.paint.Color vColor;
+	static com.itextpdf.kernel.colors.Color dColorConfig;
+	static com.itextpdf.kernel.colors.Color bColorConfig;
+	static com.itextpdf.kernel.colors.Color vColorConfig;
 	static Text colorStat;
 	static Text sectionStat;
 	static Text venueStat;
@@ -115,7 +119,7 @@ public class Main extends Application {
 		GridPane pageSettingLayOut = new GridPane();
 		pageSettingLayOut.setHgap(10);
 		pageSettingLayOut.setVgap(10);
-		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 350);
+		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 400);
 		Text pageNumberText = new Text("Page#");
 		pageNumberText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 		Text daysPerPageText = new Text("Days/Page");
@@ -134,7 +138,8 @@ public class Main extends Application {
 		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
 		for (int n = 2; n < 10; n++) {
 			NumField textField = new NumField();
-			textField.setText("0");
+			String defTxt = (n<6)? "4": "0";
+			textField.setText(defTxt);
 			textField.setId(varNames[n - 2]);
 			pageSettingLayOut.add(textField, 6, n);
 			daysPerPageInput.add(textField);
@@ -296,6 +301,7 @@ public class Main extends Application {
 				int g = (int) green;
 				int b = (int) blue;
 				dColor = Color.rgb(r, g, b);
+				dColorConfig = new DeviceRgb(r, g, b);
 				dayHeaderColor.setFill(dColor);
 			}
 		});
@@ -315,6 +321,7 @@ public class Main extends Application {
 				int g = (int) green;
 				int b = (int) blue;
 				bColor = Color.rgb(r, g, b);
+				bColorConfig = new DeviceRgb(r, g, b);
 				backgroundColor.setFill(bColor);
 			}
 		});
@@ -334,6 +341,7 @@ public class Main extends Application {
 				int g = (int) green;
 				int b = (int) blue;
 				vColor = Color.rgb(r, g, b);
+				vColorConfig = new DeviceRgb(r, g, b);
 				venueColor.setFill(vColor);
 			}
 		});
@@ -389,11 +397,14 @@ public class Main extends Application {
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
 
 		Text fontSize = new Text("Size");
-		ObservableList<Integer> sizes = FXCollections.observableArrayList(6, 8, 10);
-		final ComboBox<Integer> sizeBox = new ComboBox<Integer>(sizes); // only applies to the screen time blocks
-		// other font sizes are fixed for printing purpose.
+		ObservableList<Integer> sizes = FXCollections.observableArrayList();
+		for (int i = 2; i < 33; i+=2) {
+			sizes.add(i);
+		}
+		final ComboBox<Integer> sizeBox = new ComboBox<Integer>(sizes); // only applying to venue font sizes yet.
+		sizeBox.getSelectionModel().select(5);
 
-		sizeBox.setPrefWidth(50);
+		sizeBox.setPrefWidth(100);
 		fontConfig.add(fontTitle, 0, 0);
 		fontConfig.add(fontFace, 0, 1);
 		fontConfig.add(fontBox, 1, 1);
@@ -449,7 +460,7 @@ public class Main extends Application {
 						// a specific venue(unique to object)
 						// a specific date(unique to object)
 						// an arraylist of sct data(all of the movies shown on this venue at this date)
-						VenueDateTable vdtEntry = new VenueDateTable(vt, d, 20);
+						VenueDateTable vdtEntry = new VenueDateTable(vt, d, 25);
 						if (checkEmpty.isSelected()) {
 							if (!vdtEntry.thisVDT.isEmpty()) {
 								VDTList.add(vdtEntry);
@@ -472,7 +483,7 @@ public class Main extends Application {
 				int c = 1;
 				int dayCounter = 0;
 				for (int i : pageLayoutSetting) {
-					if (i > 0 && dayCounter < DList.size()) {
+					if (dayCounter < DList.size()) {
 						PageTable pTable = new PageTable(DList, i, c++);
 						PList.add(pTable);
 						dayCounter += pTable.numOfDays;
@@ -483,27 +494,28 @@ public class Main extends Application {
 				if (dayCounter <= dateList.size()) {
 					int leftOver = dateList.size() - dayCounter;
 					Status.print("After formatting, you have " + leftOver + " days left unallocated.");
-					int leftOverHeight = 0;
-					for (int l = DList.size() - leftOver; l < DList.size(); l++) {
-						leftOverHeight += DList.get(l).thisHeight;
-						Status.print(DList.get(l).dayDate + "");
-						Status.print(leftOverHeight + "");
-					}
-					try {
-						int leftOverPage = (int) Math.ceil(leftOverHeight / PList.get(0).maxHeight);
-						Status.print("It will take approximately " + leftOverPage
-								+ " more pages to fill in all of the days.");
-					} catch (IndexOutOfBoundsException empty) {
-						Status.print("Please update your page setting.");
-					}
+//					int leftOverHeight = 0;
+//					for (int l = DList.size() - leftOver; l < DList.size(); l++) {
+//						leftOverHeight += DList.get(l).thisHeight;
+//						Status.print(DList.get(l).dayDate + "");
+//						Status.print(leftOverHeight + "");
+//					}
+//					try {
+//						int leftOverPage = (int) Math.ceil(leftOverHeight / PList.get(0).maxHeight);
+//						Status.print("It will take approximately " + leftOverPage
+//								+ " more pages to fill in all of the days.");
+//					} catch (IndexOutOfBoundsException empty) {
+//						Status.print("Please update your page setting.");
+//					}
+//					super spaghetti, not priority, fix later				
+
 				}
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList);
-				
+				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig);
 				try {
-					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString(), table);
+					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString(), table, config);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 

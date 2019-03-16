@@ -6,15 +6,15 @@ public class PageTable {
 	static int dayCount = 0;
 	static int pageCount = 1;
 	int numOfDays = 0;
-	final int maxHeight = 736;
+	final int maxHeight = 736 * 4;
 	int thisHeight = 0;
 	int pageNum;
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
 
 	public PageTable(ArrayList<DayTable> list, int days, int page) {
 		int upperBound = dayCount + days;
-		pageNum = page;
-		pageCount++;
+		pageNum = pageCount++;
+
 		Status.print("Trying to allocate " + days + " days into page " + page + "...");
 		int heightCounter = 0;
 		if (upperBound > list.size()) {

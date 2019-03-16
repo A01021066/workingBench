@@ -17,14 +17,12 @@ import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.*;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
-import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
@@ -36,8 +34,16 @@ import com.itextpdf.layout.property.TextAlignment;
 
 public class PDFGenerator {
 	String destPath;
-
-	AllTable table;
+	int venueFontSize;
+	Color dColor;
+	Color bColor;
+	Color vColor;
+	
+	ArrayList<PageTable> pageList = new ArrayList<PageTable>();
+	ArrayList<VenueTable> venueList = new ArrayList<VenueTable>();
+	ArrayList<VenueDateTable> screenTimeList = new ArrayList<VenueDateTable>();
+	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
+	ArrayList<Date> dateList = new ArrayList<Date>();
 	private static int dayCounter = 0;
 	// Used to specify the amount of cells in a row and the weight of each cell
 	private float[] tableCellNumbers;
@@ -50,6 +56,8 @@ public class PDFGenerator {
 	
 	// margin spaces between tables on the document
 	private final int TABLE_MARGIN = 5;
+	
+	private final int number_of_columns = 1080;
 
 	/**
 	 * Constant for the value of the PDF's page width.
@@ -89,12 +97,22 @@ public class PDFGenerator {
 	 * Constant for date row font size.
 	 */
 	private static final int TIME_FONT_SIZE = 7;
+	
+	private static final int VENUE_FONT_SIZE = 18;
 
-	public PDFGenerator(String dest, AllTable table) throws IOException {
+	public PDFGenerator(String dest, AllTable table, Configuration config) throws IOException {
 		setDest(dest);
 		File file = new File(dest);
 		file.getParentFile().mkdirs();
-		this.table = table;
+		pageList = table.PList;
+		dayList = table.DList;
+		venueList = table.VTList;
+		screenTimeList = table.VDTList;
+		dateList = table.dateList;
+		venueFontSize = config.venue_font_Size;
+		dColor = config.dColor;
+		bColor = config.bColor;
+		vColor = config.vColor;
 		generate();
 	}
 
@@ -106,22 +124,27 @@ public class PDFGenerator {
 	}
 
 	public void generate() throws FileNotFoundException {
-		int number_of_columns = 1080;
 
 		PdfWriter writer = new PdfWriter(destPath);
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
-		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT));
+		Document document = new Document(pdf, new PageSize(651, 736).rotate());
 
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
 		Arrays.fill(tableCellNumbers, 1.0f);
-		for (PageTable pt : table.PList) {
+
+		for (PageTable pt : pageList) {
+			System.out.println(pt.pageNum);
+			int heightCounter = 0;
 			for (int i = 0; i < pt.numOfDays; i++) {
-				Table day = createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate));
-				day.setHeight(pt.dayList.get(i).thisHeight);
-				System.out.println(pt.dayList.get(i));
-				document.add(day);
+				document.add(createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate)));
+				heightCounter += pt.thisHeight;
+			}
+			if (heightCounter <= PAGE_HEIGHT) {
+				Table rect = new Table(1);
+				rect.useAllAvailableWidth().setHeight(PAGE_HEIGHT - heightCounter);
+				document.add(rect);
 			}
 		}
 		dayCounter = 0;
@@ -180,28 +203,77 @@ public class PDFGenerator {
 		listOfTimes.add("01:00");
 
 		// Initialize table with 1080 cells across
-		
 		Table schedule_table = new Table(tableCellNumbers);
 
-		schedule_table.setWidth(PAGE_WIDTH).setTextAlignment(TextAlignment.LEFT)
-				.setHorizontalAlignment(HorizontalAlignment.LEFT).setBackgroundColor(WebColors.getRGBColor("WHITE"))
-				/*.setMarginTop(TABLE_MARGIN)*/;
-
-		//schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
+		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
+				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
+				.setMarginTop(TABLE_MARGIN);
+		//schedule_table.setHeight(30);
+		schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
 		Cell cell;
-//		cell = new Cell(1, number_of_columns).setBackgroundColor(WebColors.getRGBColor("BLACK")).setPadding(0);
-//		schedule_table.addHeaderCell(cell);
-//		
-		cell = new Cell(1, 1).setBackgroundColor(WebColors.getRGBColor("WHITE")).setPadding(0);
-		Text text = new Text(date);
-		cell.getChildren().add(text);
+		
+		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0);
 		schedule_table.addHeaderCell(cell);
-//		for (int i = 0; i < listOfTimes.size(); i++)
-//		{
-//			//schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
-//		}
+		
+		for (int i = 0; i < listOfTimes.size(); i++)
+		{
+			schedule_table.addHeaderCell(createTimeCell(listOfTimes.get(i)));
+		}
 
-//		
+////      Trying to add blank rows here...	
+		for (VenueDateTable vdt : table.venueSCTList) {
+			schedule_table.startNewRow();
+			Table row = createVDTRow(vdt);
+			schedule_table.addCell(row);
+		}
 		return schedule_table;
 	}
+	
+	   /**
+     * Creates a type of cell that contains the date
+     * 
+     * @author Steven Ma 
+     */
+    private Cell createDateCell(int cellWidth, String date)
+    {
+        Cell cell = new Cell(1, cellWidth);
+        cell.add(new Paragraph(date).setFontSize(DATE_FONT_SIZE).setBold().setFontColor(ColorConstants.WHITE)); //Color changed to ColorConstants
+        cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0)
+                .setPaddingLeft(5);
+        return cell;
+    }
+    
+    /**
+     * Creates a type of cell that contains the schedule times
+     * 
+     * @author Steven Ma
+     *3
+     */
+    private Cell createTimeCell(String time)
+    {
+        Cell cell = new Cell(1, HOUR);
+//        cell.setBorder(Border.NO_BORDER);
+        cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(0).setBold().setFontColor(ColorConstants.WHITE) 
+                .setBackgroundColor(bColor); //Color changed to ColorConstants
+        return cell;
+    }
+    
+    
+    private Cell createVenueCell(int cellWidth, String name) {
+        Cell cell = new Cell(0,HOUR *2);
+        System.out.println("Font: " + venueFontSize);
+        cell.add(new Paragraph(name).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.BLACK)); //Color changed to ColorConstants
+        cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(vColor).setPadding(0)
+                .setPaddingLeft(0);
+        return cell;
+    }
+    private Table createVDTRow (VenueDateTable vdt) {
+    	Table vdtRow = new Table(number_of_columns);
+		vdtRow.useAllAvailableWidth().setBackgroundColor(dColor).setHeight(vdt.thisHeight);
+		vdtRow.addCell(createVenueCell(HOUR, vdt.thisVenue.getNameShort()));
+    	vdtRow.setHeight(vdt.thisHeight);
+    	return vdtRow;
+    }
 }
+
+
