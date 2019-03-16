@@ -47,6 +47,7 @@ public class Main extends Application {
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
+	static TextField rowHeightConfigInput = new TextField("30");
 	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
@@ -460,7 +461,8 @@ public class Main extends Application {
 						// a specific venue(unique to object)
 						// a specific date(unique to object)
 						// an arraylist of sct data(all of the movies shown on this venue at this date)
-						VenueDateTable vdtEntry = new VenueDateTable(vt, d, 25);
+						System.out.println(Integer.parseInt(rowHeightConfigInput.getText()));
+						VenueDateTable vdtEntry = new VenueDateTable(vt, d, Integer.parseInt(rowHeightConfigInput.getText()));
 						if (checkEmpty.isSelected()) {
 							if (!vdtEntry.thisVDT.isEmpty()) {
 								VDTList.add(vdtEntry);
@@ -548,6 +550,9 @@ public class Main extends Application {
 		GridPane timeBlockConfig = new GridPane();
 		timeBlockConfig.setHgap(10);
 		timeBlockConfig.setVgap(10);
+		Text rowHeightConfig = new Text("Row Height: ");
+
+		rowHeightConfigInput.setPrefWidth(150);
 		Text timeBlockTitle = new Text("Block Config:");
 		timeBlockTitle.setStyle("-fx-font-weight: bold");
 		Text minPerPxl = new Text("Mins/Pixel");
@@ -555,6 +560,8 @@ public class Main extends Application {
 		minPerPxlField.setPrefWidth(50);
 		checkEmpty = new RadioButton("Clear Empty Rows");
 		timeBlockConfig.add(checkEmpty, 0, 2);
+		timeBlockConfig.add(rowHeightConfig, 0, 3);
+		timeBlockConfig.add(rowHeightConfigInput, 1, 3);
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
 		timeBlockConfig.add(minPerPxl, 0, 1);
 		timeBlockConfig.add(minPerPxlField, 1, 1);
