@@ -261,7 +261,6 @@ public class PDFGenerator {
     
     private Cell createVenueCell(int cellWidth, String name) {
         Cell cell = new Cell(0,HOUR *2);
-        System.out.println("Font: " + venueFontSize);
         cell.add(new Paragraph(name).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.BLACK)); //Color changed to ColorConstants
         cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(vColor).setPadding(0)
                 .setPaddingLeft(0);

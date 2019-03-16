@@ -47,9 +47,9 @@ public class Main extends Application {
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
-	static com.itextpdf.kernel.colors.Color dColorConfig;
-	static com.itextpdf.kernel.colors.Color bColorConfig;
-	static com.itextpdf.kernel.colors.Color vColorConfig;
+	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
+	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
+	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static Text colorStat;
 	static Text sectionStat;
 	static Text venueStat;
