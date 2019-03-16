@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/io-7.1.5.jar"/>
 	<classpathentry kind="lib" path="lib/kernel-7.1.5.jar" sourcepath="C:/Users/liuou/.m2/repository/com/itextpdf/kernel/7.1.5/kernel-7.1.5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/layout-7.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/layout-7.1.5.jar" sourcepath="C:/Users/liuou/.m2/repository/com/itextpdf/layout/7.1.5/layout-7.1.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>

@@ -30,6 +30,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.property.UnitValue;
 
 public class PDFGenerator {
 	String destPath;
@@ -97,7 +98,6 @@ public class PDFGenerator {
 	 */
 	private static final int TIME_FONT_SIZE = 7;
 
-
 	public PDFGenerator(String dest, AllTable table, Configuration config) throws IOException {
 		setDest(dest);
 		File file = new File(dest);
@@ -137,15 +137,6 @@ public class PDFGenerator {
 			for (int i = 0; i < pt.numOfDays; i++) {
 				Table dayTable = createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate));
 				document.add(dayTable);
-				for (VenueDateTable vdt : dayList.get(i+1).venueSCTList) {
-					Table row = createVDTRow(vdt);
-					if (dayList.get(i+1).venueSCTList.indexOf(vdt) % 2 == 0) {
-						row.setBackgroundColor(ColorConstants.DARK_GRAY);
-					} else {
-						row.setBackgroundColor(ColorConstants.GRAY);
-					}
-					document.add(row);
-				}
 				heightCounter += pt.thisHeight;
 			}
 			if (heightCounter <= PAGE_HEIGHT) {
@@ -187,10 +178,9 @@ public class PDFGenerator {
 		// For truncating strings that are too long for the cell
 		int charsPerCell = 3;
 
-
 		// list of times
-		String[] times = {"10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
-				"17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00"};
+		String[] times = { "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00",
+				"20:00", "21:00", "22:00", "23:00", "00:00", "01:00" };
 
 		// Initialize table with 1080 cells across
 		Table schedule_table = new Table(number_of_columns);
@@ -198,7 +188,6 @@ public class PDFGenerator {
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
 				.setMarginTop(TABLE_MARGIN);
-		// schedule_table.setHeight(30);
 		schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
 		Cell cell;
 
@@ -208,7 +197,16 @@ public class PDFGenerator {
 		for (int i = 0; i < times.length; i++) {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
 		}
-
+		
+		for (VenueDateTable vdt : table.venueSCTList) {
+				Cell vdtCell = new Cell(1, HOUR * 2);
+				vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setFontSize(venueFontSize).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
+				vdtCell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
+				vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+				schedule_table.addCell(vdtCell);
+				schedule_table.startNewRow();
+				//**add show time here**
+			}
 		return schedule_table;
 	}
 
@@ -219,11 +217,8 @@ public class PDFGenerator {
 	 */
 	private Cell createDateCell(int cellWidth, String date) {
 		Cell cell = new Cell(1, cellWidth);
-		cell.add(new Paragraph(date).setFontSize(DATE_FONT_SIZE).setBold().setFontColor(ColorConstants.WHITE)); // Color
-																												// changed
-																												// to
-																												// ColorConstants
-		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(0);
+		cell.add(new Paragraph(date).setFontSize(DATE_FONT_SIZE).setBold().setFontColor(ColorConstants.WHITE)); // ColorConstants
+		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10);
 		return cell;
 	}
 
@@ -234,29 +229,36 @@ public class PDFGenerator {
 	 */
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
-//        cell.setBorder(Border.NO_BORDER);
+		//cell.setBorder(Border.NO_BORDER);
 		cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(0).setBold()
-				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor); // Color changed to ColorConstants
+				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
 
-	private Cell createVenueCell(int cellWidth, String name) {
-		Cell cell = new Cell();
-		cell.add(new Paragraph(name).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.BLACK));
-		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(vColor);
-		cell.setWidth(cellWidth);
+	private Cell createVenueCell(String name, Table table) {
+		Cell cell = new Cell(1, HOUR * 2);
+		cell.add(new Paragraph(name).setWidth(table.getColumnWidth(0)).setFontSize(venueFontSize).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
+		cell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
+		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+		cell.setWidth(table.getColumnWidth(0));
 		return cell;
 	}
 
-	private Table createVDTRow(VenueDateTable vdt) {
+	private Table createVDTRow(VenueDateTable vdt, int index) {
 		Table vdtRow = new Table(number_of_columns);
 		vdtRow.useAllAvailableWidth().setHeight(vdt.thisHeight);
-		vdtRow.addCell(createVenueCell(HOUR * 2, vdt.thisVenue.getNameShort()));
+		Cell venue = createVenueCell(vdt.thisVenue.getNameShort(), vdtRow);
+		venue.setHeight(vdt.thisHeight);
+		vdtRow.addCell(venue);
 		vdtRow.setHeight(vdt.thisHeight);
 
-		
-		for (ScreenTimeData sct : vdt.thisVDT) {
-			Cell screenTime = new Cell().setWidth((50)).setStrokeColor(ColorConstants.WHITE).setBackgroundColor(ColorConstants.BLUE);
+		for (int i = 0; i < 16; i++) {
+			Cell screenTime = new Cell(1, 1);
+			if (i % 2 == 0) {
+				screenTime.setBackgroundColor(ColorConstants.GRAY);
+			} else {
+				screenTime.setBackgroundColor(ColorConstants.DARK_GRAY);
+			}
 			vdtRow.addCell(screenTime);
 		}
 		return vdtRow;

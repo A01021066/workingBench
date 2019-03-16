@@ -397,9 +397,9 @@ public class Main extends Application {
 		ObservableList<String> fonts = FXCollections.observableArrayList("Times New Roman", "Comic Sans", "Fonts");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
 
-		Text fontSize = new Text("Size");
+		Text fontSize = new Text("Size (Applying to venue name only for now)");
 		ObservableList<Integer> sizes = FXCollections.observableArrayList();
-		for (int i = 2; i < 33; i+=2) {
+		for (int i = 2; i < 33; i++) {
 			sizes.add(i);
 		}
 		final ComboBox<Integer> sizeBox = new ComboBox<Integer>(sizes); // only applying to venue font sizes yet.
@@ -461,7 +461,7 @@ public class Main extends Application {
 						// a specific venue(unique to object)
 						// a specific date(unique to object)
 						// an arraylist of sct data(all of the movies shown on this venue at this date)
-						System.out.println(Integer.parseInt(rowHeightConfigInput.getText()));
+						
 						VenueDateTable vdtEntry = new VenueDateTable(vt, d, Integer.parseInt(rowHeightConfigInput.getText()));
 						if (checkEmpty.isSelected()) {
 							if (!vdtEntry.thisVDT.isEmpty()) {
