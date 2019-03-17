@@ -7,13 +7,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.PriorityQueue;
-import java.util.Map.Entry;
 
+import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.*;
 import com.itextpdf.kernel.events.Event;
 import com.itextpdf.kernel.events.IEventHandler;
@@ -22,15 +23,13 @@ import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.font.FontProvider;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.property.VerticalAlignment;
 
 public class PDFGenerator {
 	String destPath;
@@ -38,6 +37,8 @@ public class PDFGenerator {
 	Color dColor;
 	Color bColor;
 	Color vColor;
+	String masterFont;
+	PdfFont font;
 
 	ArrayList<PageTable> pageList = new ArrayList<PageTable>();
 	ArrayList<VenueTable> venueList = new ArrayList<VenueTable>();
@@ -111,6 +112,18 @@ public class PDFGenerator {
 		dColor = config.dColor;
 		bColor = config.bColor;
 		vColor = config.vColor;
+		switch (config.masterFont) {
+		case 0:
+			font =  PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
+			break;
+		case 1:
+			font =  PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			break;
+		case 2:
+			font =  PdfFontFactory.createFont(StandardFonts.COURIER);
+			break;
+
+		}
 		generate();
 	}
 
@@ -127,6 +140,7 @@ public class PDFGenerator {
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
 		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT).rotate());
+		document.setFontProvider(document.getFontProvider());
 
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
@@ -200,12 +214,15 @@ public class PDFGenerator {
 		
 		for (VenueDateTable vdt : table.venueSCTList) {
 				Cell vdtCell = new Cell(1, HOUR * 2);
-				vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setFontSize(venueFontSize).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
+				vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
 				vdtCell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
 				vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+				vdtCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+				//TODO do we go with height setting, or font size setting?
+				vdtCell.setHeight(vdt.thisHeight);
 				schedule_table.addCell(vdtCell);
 				schedule_table.startNewRow();
-				//**add show time here**
+				//TODO add show time here
 			}
 		return schedule_table;
 	}

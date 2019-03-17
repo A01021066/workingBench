@@ -1,5 +1,6 @@
 package viffpdf;
 
+import javafx.scene.text.Font;
 import java.io.Serializable;
 
 import com.itextpdf.kernel.colors.Color;
@@ -11,12 +12,14 @@ public class Configuration implements Serializable {
 	Color dColor;
 	Color bColor;
 	Color vColor;
+	int masterFont;
 	
-	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor) {
+	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor, int masterFont) {
 		this.venue_font_Size = venueFontSize;
 		this.dColor = dColor;
 		this.bColor = bColor;
 		this.vColor = vColor;
+		this.masterFont = masterFont;
 	}
 	
 	//might be better if return a collection.

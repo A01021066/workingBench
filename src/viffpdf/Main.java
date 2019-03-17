@@ -57,7 +57,7 @@ public class Main extends Application {
 	static Text screenTimeStat;
 	static TextArea logArea;
 	static RadioButton checkEmpty;
-
+	static int masterFont = 0;
 	static File colorTab;
 	static File sectionTab;
 	static File venueTab;
@@ -394,8 +394,9 @@ public class Main extends Application {
 		fontTitle.setStyle("-fx-font-weight: bold");
 
 		Text fontFace = new Text("Font");
-		ObservableList<String> fonts = FXCollections.observableArrayList("Times New Roman", "Comic Sans", "Fonts");
+		ObservableList<String> fonts = FXCollections.observableArrayList("Times Roman", "Helvetica", "Courier");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
+
 
 		Text fontSize = new Text("Size (Applying to venue name only for now)");
 		ObservableList<Integer> sizes = FXCollections.observableArrayList();
@@ -514,7 +515,9 @@ public class Main extends Application {
 				}
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList);
-				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig);
+				masterFont = fonts.indexOf(fontBox.getValue());
+
+				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, masterFont);
 				try {
 					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString(), table, config);
 				} catch (IOException e) {
@@ -550,7 +553,7 @@ public class Main extends Application {
 		GridPane timeBlockConfig = new GridPane();
 		timeBlockConfig.setHgap(10);
 		timeBlockConfig.setVgap(10);
-		Text rowHeightConfig = new Text("Row Height: ");
+		Text rowHeightConfig = new Text("Max Row Height: ");
 
 		rowHeightConfigInput.setPrefWidth(150);
 		Text timeBlockTitle = new Text("Block Config:");
