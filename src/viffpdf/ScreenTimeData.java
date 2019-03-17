@@ -28,7 +28,7 @@ public class ScreenTimeData extends RowData
 	 * lengthMin - The length of the movie in minutes. lengthHrs - The length of
 	 * the movie in HHMM. startTime - The start time of the movie in HHMM.
 	 */
-	private int lengthMin, lengthHrs, startTime;
+	private int lengthMin, lengthHrs, startTime, startBlock;
 
 	/**
 	 * Constructs a ScreenTime based on an array of relevant data.
@@ -81,6 +81,7 @@ public class ScreenTimeData extends RowData
 			lengthHrs = Integer.parseInt(data.get(4).replace(":", "")) / 100;
 			sectionCode = data.get(5);
 			startTime = Integer.parseInt(data.get(6).replace(":", "")) / 100;
+			startBlock = this.getStartTime() - 570;
 			venueCode = data.get(7);
 			pageNum = data.get(8);
 		} catch (NumberFormatException e)
@@ -256,8 +257,13 @@ public class ScreenTimeData extends RowData
 	public int getStartTime()
 	{
 		int hours = startTime / 100;
-		int minutes = (startTime % 100) + (hours * 60);
+		int minutes = startTime % 100 + (hours * 60);
 		return minutes;
+
+	}
+	
+	public int getStartBlock() {
+		return startBlock;
 	}
 
 	/**

@@ -57,7 +57,7 @@ public class Main extends Application {
 	static Text screenTimeStat;
 	static TextArea logArea;
 	static RadioButton checkEmpty;
-	static int masterFont = 0;
+	static int masterFont;
 	static File colorTab;
 	static File sectionTab;
 	static File venueTab;
@@ -396,6 +396,7 @@ public class Main extends Application {
 		Text fontFace = new Text("Font");
 		ObservableList<String> fonts = FXCollections.observableArrayList("Times Roman", "Helvetica", "Courier");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
+		fontBox.getSelectionModel().selectFirst();
 
 
 		Text fontSize = new Text("Size (Applying to venue name only for now)");

@@ -13,7 +13,6 @@ import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.*;
 import com.itextpdf.kernel.events.Event;
@@ -26,7 +25,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.font.FontProvider;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
@@ -37,7 +35,7 @@ public class PDFGenerator {
 	Color dColor;
 	Color bColor;
 	Color vColor;
-	String masterFont;
+	int masterFont;
 	PdfFont font;
 
 	ArrayList<PageTable> pageList = new ArrayList<PageTable>();
@@ -114,13 +112,15 @@ public class PDFGenerator {
 		vColor = config.vColor;
 		switch (config.masterFont) {
 		case 0:
-			font =  PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
+			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
+			// http://itextsupport.com/apidocs/itext7/7.1.1/com/itextpdf/io/font/constants/StandardFonts.html
+			// this shit is black magic
 			break;
 		case 1:
-			font =  PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 			break;
 		case 2:
-			font =  PdfFontFactory.createFont(StandardFonts.COURIER);
+			font = PdfFontFactory.createFont(StandardFonts.COURIER);
 			break;
 
 		}
@@ -211,19 +211,63 @@ public class PDFGenerator {
 		for (int i = 0; i < times.length; i++) {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
 		}
-		
+
 		for (VenueDateTable vdt : table.venueSCTList) {
-				Cell vdtCell = new Cell(1, HOUR * 2);
-				vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
-				vdtCell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
-				vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-				vdtCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-				//TODO do we go with height setting, or font size setting?
-				vdtCell.setHeight(vdt.thisHeight);
-				schedule_table.addCell(vdtCell);
-				schedule_table.startNewRow();
-				//TODO add show time here
+
+			Cell vdtCell = new Cell(1, HOUR * 2);
+			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setFontSize(venueFontSize).setFont(font)
+					.setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
+			vdtCell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
+			vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+			vdtCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+			// TODO do we go with height setting, or font size setting?
+			vdtCell.setHeight(vdt.thisHeight);
+			schedule_table.addCell(vdtCell);
+			int minCounter = 0;
+
+			for (ScreenTimeData sct : vdt.thisVDT) {
+				int movieStartBlock = sct.getStartBlock();
+				System.out.println("Block: " + sct.getStartBlock());
+				System.out.println("Time: " + sct.getStartTime());
+				if (movieStartBlock > minCounter) {
+					Cell emptyCell = new Cell(1, movieStartBlock - minCounter).setPadding(0).setMargin(0)
+							/*.setBorder(null)*/;
+					emptyCell.setHeight(vdt.thisHeight);
+					schedule_table.addCell(emptyCell);
+					if (table.venueSCTList.indexOf(vdt) %2 == 0) {
+						emptyCell.setBackgroundColor(ColorConstants.GRAY);
+					} else {
+						emptyCell.setBackgroundColor(ColorConstants.DARK_GRAY);
+					}
+					minCounter+= (movieStartBlock - minCounter);
+				}
+
+				Cell sctCell = new Cell(1, sct.getLengthHrs());
+				sctCell.setHeight(vdt.thisHeight);
+				sctCell.add(new Paragraph(sct.getMovieName()).setFontSize(venueFontSize).setFont(font)
+						.setFontColor(ColorConstants.BLACK).setTextAlignment(TextAlignment.CENTER));
+				sctCell.setBackgroundColor(dColor).setPadding(0);
+				sctCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+				sctCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+				minCounter+= sct.getLengthHrs();
+
+				schedule_table.addCell(sctCell);
 			}
+			if (minCounter < 960) {
+				Cell fill = new Cell(1, 960 - minCounter).setPadding(0).setMargin(0);
+				fill.setHeight(vdt.thisHeight);
+				if (table.venueSCTList.indexOf(vdt) %2 == 0) {
+					fill.setBackgroundColor(ColorConstants.GRAY);
+				} else {
+					fill.setBackgroundColor(ColorConstants.DARK_GRAY);
+				}
+				schedule_table.addCell(fill);
+				
+			}
+			schedule_table.startNewRow();
+
+			// TODO add show time here
+		}
 		return schedule_table;
 	}
 
@@ -246,15 +290,16 @@ public class PDFGenerator {
 	 */
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
-		//cell.setBorder(Border.NO_BORDER);
-		cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(0).setBold()
+		// cell.setBorder(Border.NO_BORDER);
+		cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(5).setBold()
 				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
 
 	private Cell createVenueCell(String name, Table table) {
 		Cell cell = new Cell(1, HOUR * 2);
-		cell.add(new Paragraph(name).setWidth(table.getColumnWidth(0)).setFontSize(venueFontSize).setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
+		cell.add(new Paragraph(name).setWidth(table.getColumnWidth(0)).setFontSize(venueFontSize)
+				.setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
 		cell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
 		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 		cell.setWidth(table.getColumnWidth(0));
