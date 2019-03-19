@@ -520,7 +520,7 @@ public class Main extends Application {
 
 				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, masterFont);
 				try {
-					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString(), table, config);
+					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf", table, config);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

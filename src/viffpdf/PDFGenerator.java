@@ -203,7 +203,7 @@ public class PDFGenerator {
 		Cell cell;
 
 		// adding the blank space left on the time gird row
-		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0);
+		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0).setBorder(Border.NO_BORDER);
 		schedule_table.addHeaderCell(cell);
 
 		// adding the time grid
@@ -433,34 +433,4 @@ public class PDFGenerator {
 			super.draw(drawContext);
 		}
 	}
-
-//	private Cell createVenueCell(String name, Table table) {
-//		Cell cell = new Cell(1, HOUR * 2);
-//		cell.add(new Paragraph(name).setWidth(table.getColumnWidth(0)).setFontSize(12)
-//				.setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
-//		cell.setTextAlignment(TextAlignment.CENTER).setBackgroundColor(vColor);
-//		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-//		cell.setWidth(table.getColumnWidth(0));
-//		return cell;
-//	}
-
-//	private Table createVDTRow(VenueDateTable vdt, int index) {
-//		Table vdtRow = new Table(number_of_columns);
-//		vdtRow.useAllAvailableWidth().setHeight(vdt.rowHeight);
-//		Cell venue = createVenueCell(vdt.thisVenue.getNameShort(), vdtRow);
-//		venue.setHeight(vdt.rowHeight);
-//		vdtRow.addCell(venue);
-//		vdtRow.setHeight(vdt.rowHeight);
-//
-//		for (int i = 0; i < 16; i++) {
-//			Cell screenTime = new Cell(1, 1);
-//			if (i % 2 == 0) {
-//				screenTime.setBackgroundColor(ColorConstants.GRAY);
-//			} else {
-//				screenTime.setBackgroundColor(ColorConstants.DARK_GRAY);
-//			}
-//			vdtRow.addCell(screenTime);
-//		}
-//		return vdtRow;
-//	}
 }
