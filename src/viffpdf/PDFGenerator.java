@@ -152,7 +152,7 @@ public class PDFGenerator {
 		PdfWriter writer = new PdfWriter(destPath);
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
-		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT).rotate());
+		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT)/*.rotate()*/);
 		document.setFontProvider(document.getFontProvider());
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
@@ -216,7 +216,8 @@ public class PDFGenerator {
 
 		// Initialize table with 1080 cells across
 		Table schedule_table = new Table(number_of_columns);
-
+		//prevent table from spliting.
+		schedule_table.setKeepTogether(true);
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
 				.setMarginTop(TABLE_MARGIN);
