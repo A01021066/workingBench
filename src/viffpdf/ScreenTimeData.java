@@ -81,7 +81,7 @@ public class ScreenTimeData extends RowData
 			lengthHrs = Integer.parseInt(data.get(4).replace(":", "")) / 100;
 			sectionCode = data.get(5);
 			startTime = Integer.parseInt(data.get(6).replace(":", "")) / 100;
-			startBlock = this.getStartTime() - 570;
+			startBlock = this.getStartTime() - 570; //9:30 in minutes;
 			venueCode = data.get(7);
 			pageNum = data.get(8);
 		} catch (NumberFormatException e)
