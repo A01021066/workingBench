@@ -152,8 +152,9 @@ public class PDFGenerator {
 		PdfWriter writer = new PdfWriter(destPath);
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
-		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT)/*.rotate()*/);
+		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT).rotate());
 		document.setFontProvider(document.getFontProvider());
+		document.setMargins(5,5,5,5);
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
 		Arrays.fill(tableCellNumbers, 1.0f);
@@ -186,13 +187,14 @@ public class PDFGenerator {
 		public void handleEvent(Event event) {
 			PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
 			PdfPage page = docEvent.getPage();
+			
 
 			int pagenumber = docEvent.getDocument().getNumberOfPages();
 			PdfCanvas canvas = new PdfCanvas(page);
 			Rectangle rect = page.getPageSize();
-//			canvas.saveState().setFillColor(WebColors.getRGBColor("Black"))
-//					.rectangle(rect.getLeft(), rect.getBottom(), rect.getWidth(), rect.getHeight()).fillStroke()
-//					.restoreState();
+			canvas.saveState().setFillColor(WebColors.getRGBColor("Black"))
+					.rectangle(rect.getLeft(), rect.getBottom(), rect.getWidth(), rect.getHeight()).fillStroke()
+					.restoreState();
 		}
 	}
 
@@ -219,11 +221,11 @@ public class PDFGenerator {
 		//prevent table from spliting.
 		schedule_table.setKeepTogether(true);
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
-				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
-				.setMarginTop(TABLE_MARGIN);
-		schedule_table.setBorder(border);
+				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(ColorConstants.BLACK)
+				.setMarginBottom(TABLE_MARGIN);
+		schedule_table.setBorder(Border.NO_BORDER);
 		// adding date at the top
-		schedule_table.addHeaderCell(createDateCell(number_of_columns, date).setBorder(border));
+		schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
 		Cell cell;
 
 		// adding the blank space left on the time gird row
@@ -254,7 +256,7 @@ public class PDFGenerator {
 
 			// TODO do we go with height setting, or font size setting?
 			vdtCell.setHeight(vdt.thisHeight).setBorder(Border.NO_BORDER);
-			vdtCell.setBorderBottom(border).setBorderRight(border);
+			vdtCell.setBorderBottom(Border.NO_BORDER);
 
 			// adding screen times for this row.
 			schedule_table.addCell(vdtCell);
@@ -343,8 +345,11 @@ public class PDFGenerator {
 	 */
 	private Cell createDateCell(int cellWidth, String date) {
 		Cell cell = new Cell(1, cellWidth);
+		cell.setHeight(13);
+		cell.setBorder(Border.NO_BORDER);
+		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE)); // ColorConstants
-		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10).setHeight(rowHeight);
+		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10);
 		return cell;
 	}
 
@@ -356,7 +361,8 @@ public class PDFGenerator {
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
 		cell.setBorder(Border.NO_BORDER);
-		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold().setHeight(rowHeight)
+		cell.setHeight(13);
+		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold()
 				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
