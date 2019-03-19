@@ -39,8 +39,6 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import com.itextpdf.layout.renderer.CellRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
 
-
-
 public class PDFGenerator {
 	String destPath;
 	int venueFontSize;
@@ -126,7 +124,7 @@ public class PDFGenerator {
 		case 0:
 			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
 			// http://itextsupport.com/apidocs/itext7/7.1.1/com/itextpdf/io/font/constants/StandardFonts.html
-			// this shit is black magic
+			// black magic
 			break;
 		case 1:
 			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -148,16 +146,17 @@ public class PDFGenerator {
 
 	public void generate() throws FileNotFoundException {
 
+		// set up the file
 		PdfWriter writer = new PdfWriter(destPath);
 		PdfDocument pdf = new PdfDocument(writer);
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
 		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT).rotate());
 		document.setFontProvider(document.getFontProvider());
-
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 		tableCellNumbers = new float[number_of_columns];
 		Arrays.fill(tableCellNumbers, 1.0f);
 
+		// draw each page we have in the data.
 		for (PageTable pt : pageList) {
 			int heightCounter = 0;
 			for (int i = 0; i < pt.numOfDays; i++) {
@@ -165,11 +164,18 @@ public class PDFGenerator {
 				document.add(dayTable);
 				heightCounter += pt.thisHeight;
 			}
+
+			// if the page's content isn't large enough to make the whole page.
 			if (heightCounter <= PAGE_HEIGHT) {
 				Table rect = new Table(1);
 				rect.useAllAvailableWidth().setHeight(PAGE_HEIGHT - heightCounter);
 				document.add(rect);
 			}
+//			if (pageList.indexOf(pt) < pageList.size() - 1) {
+//				if ((heightCounter + pageList.get(pageList.indexOf(pt) + 1).thisHeight) > PAGE_HEIGHT) {
+//					continue;
+//				}
+//			}
 		}
 		dayCounter = 0;
 		document.close();
@@ -211,96 +217,119 @@ public class PDFGenerator {
 
 		// Initialize table with 1080 cells across
 		Table schedule_table = new Table(number_of_columns);
-		
 
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setBackgroundColor(WebColors.getRGBColor("WHITE"))
 				.setMarginTop(TABLE_MARGIN);
 		schedule_table.setBorder(border);
+		// adding date at the top
 		schedule_table.addHeaderCell(createDateCell(number_of_columns, date).setBorder(border));
 		Cell cell;
 
+		// adding the blank space left on the time gird row
 		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0);
 		schedule_table.addHeaderCell(cell);
 
+		// adding the time grid
 		for (int i = 0; i < times.length; i++) {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
 		}
 
+		// adding each venue + screentime row
 		for (VenueDateTable vdt : table.venueSCTList) {
 
+			// adding venue cell, same length as the blank space for time grid
 			Cell vdtCell = new Cell(1, HOUR * 2);
-			
-			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0)).setFontSize(venueFontSize).setFont(font)
-					.setTextAlignment(TextAlignment.CENTER).setBold().setFontColor(ColorConstants.BLACK));
-			vdtCell.setTextAlignment(TextAlignment.CENTER)/*.setBackgroundColor(vColor)*/;
+
+			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0))
+					.setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold()
+					.setFontColor(ColorConstants.BLACK));
+			vdtCell.setTextAlignment(TextAlignment.CENTER)/* .setBackgroundColor(vColor) */;
 			vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 			vdtCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-			// TODO do we go with height setting, or font size setting?
-			vdtCell.setHeight(vdt.thisHeight);
-			//vdtCell.setBorderTop(Border.NO_BORDER).setBorderBottom(Border.NO_BORDER).setBorderLeft(Border.NO_BORDER);
-			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
-			
 
+			// TODO do we go with height setting, or font size setting?
+			vdtCell.setHeight(vdt.thisHeight).setBorder(Border.NO_BORDER);
+			vdtCell.setBorderBottom(border).setBorderRight(border);
+			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
+
+			// adding screen times for this row.
 			schedule_table.addCell(vdtCell);
+			// needed to track the time elapse
 			int minCounter = 0;
 
 			for (ScreenTimeData sct : vdt.thisVDT) {
+				// the column # of which the movie starts at.
 				int movieStartBlock = sct.getStartBlock();
-//				System.out.println("Block: " + sct.getStartBlock());
-//				System.out.println("Time: " + sct.getStartTime());
+				// if the movie doesn't start at column 120 (9:30AM, or the 570th minutes of the
+				// day)
 				if (movieStartBlock > minCounter) {
-					Cell emptyCell = new Cell(1, movieStartBlock - minCounter).setPadding(0).setMargin(0)
-							/*.setBorder(null)*/;
+					// create an empty cell to fill in the blank before the first movie starts
+					Cell emptyCell = new Cell(1, movieStartBlock - minCounter).setPadding(0).setMargin(0);
 					emptyCell.setHeight(vdt.thisHeight);
-					emptyCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER).setBorderRight(Border.NO_BORDER);
+					emptyCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
+							.setBorderRight(Border.NO_BORDER);
 					schedule_table.addCell(emptyCell);
-					if (table.venueSCTList.indexOf(vdt) %2 == 0) {
+					// alternate between gray and dark gray TODO change this to be user defined
+					// later
+					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						emptyCell.setBackgroundColor(ColorConstants.GRAY);
 					} else {
 						emptyCell.setBackgroundColor(ColorConstants.DARK_GRAY);
 					}
-					minCounter+= (movieStartBlock - minCounter);
+					// increment the min counter
+					minCounter += (movieStartBlock - minCounter);
 				}
 
+				// after the initial blank space. Add in the movie show time block.
 				Cell sctCell = new Cell(1, sct.getLengthMin());
-				sctCell.setHeight(vdt.thisHeight).setPadding(0).setMargin(0).setMaxWidth(0);
-				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER).setBorderRight(Border.NO_BORDER);
-				String name = sct.getMovieName();
-				
-				AffineTransform affinetransform = new AffineTransform();     
-				FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
-				Font fontSample = new Font("Tahoma", Font.PLAIN, venueFontSize);
-				int textwidth = (int)(fontSample.getStringBounds(name, frc).getWidth());
-				while (textwidth > 100) {
-					int nameLength = name.length();
-					name = name.substring(0, nameLength - 1);
-					textwidth = (int)(fontSample.getStringBounds(name, frc).getWidth());
-				}
+				sctCell.setHeight(vdt.thisHeight).setPadding(0).setMargin(0).setMaxWidth(0); // the setMaxWidth(0) fixed
+																								// the streching issue.
+																								// Black magic.
+				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
+						.setBorderRight(Border.NO_BORDER);
+
+				// truncate the movie name to fit the block size.
+//				String name = sct.getMovieName();
+//				AffineTransform affinetransform = new AffineTransform();     
+//				FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
+//				Font fontSample = new Font("Tahoma", Font.PLAIN, venueFontSize);
+//				int textwidth = (int)(fontSample.getStringBounds(name, frc).getWidth());
+//				while (textwidth > 100) {
+//					int nameLength = name.length();
+//					name = name.substring(0, nameLength - 1);
+//					textwidth = (int)(fontSample.getStringBounds(name, frc).getWidth());
+//				}
+
 				sctCell.add(new Paragraph(sct.getMovieName()).setFontSize(venueFontSize).setFont(font)
 						.setFontColor(ColorConstants.BLACK).setTextAlignment(TextAlignment.CENTER));
 				sctCell.setBackgroundColor(dColor).setPadding(0);
 				sctCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 				sctCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-				minCounter+= sct.getLengthMin();
+				minCounter += sct.getLengthMin();
 
 				schedule_table.addCell(sctCell);
 			}
+
+			// if the last movie finishes before the day finishes, add the filling cell to
+			// finish off the day.
 			if (minCounter < max_table_width) {
 				Cell fill = new Cell(1, max_table_width - minCounter).setPadding(0).setMargin(0);
 				fill.setHeight(vdt.thisHeight);
-				fill.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER).setBorderRight(Border.NO_BORDER);
-				if (table.venueSCTList.indexOf(vdt) %2 == 0) {
+				fill.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
+						.setBorderRight(Border.NO_BORDER);
+				if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 					fill.setBackgroundColor(ColorConstants.GRAY);
 				} else {
 					fill.setBackgroundColor(ColorConstants.DARK_GRAY);
 				}
+				// TODO use % 15 to draw dotted line for time grid.
 				schedule_table.addCell(fill);
-				
 			}
+			// start new row for next VDTable;
 			schedule_table.startNewRow();
 		}
-		
+
 		return schedule_table;
 	}
 
@@ -329,36 +358,35 @@ public class PDFGenerator {
 		return cell;
 	}
 
+	// triangle.
 	private class FoldedBorderCellRenderer extends CellRenderer {
+		public FoldedBorderCellRenderer(Cell modelElement) {
+			super(modelElement);
+		}
 
-		
-	    public FoldedBorderCellRenderer(Cell modelElement) {
-	        super(modelElement);
-	    }
-	 
-	    @Override
-	    public void draw(DrawContext drawContext) {
-	    	PdfCanvas canvas = drawContext.getCanvas();
-	    	canvas.saveState().setFillColor(vColor);
-	    	Rectangle cellRect = getOccupiedAreaBBox();
-	    	System.out.println("Drawiing");
-	    	//Draw the custom Cell
-	    	canvas.moveTo(cellRect.getX(), cellRect.getY() +  cellRect.getHeight());
-	    	canvas.lineTo(cellRect.getX() + cellRect.getWidth(), cellRect.getY() +  cellRect.getHeight());
-	    	canvas.lineTo(cellRect.getX() + cellRect.getWidth(), cellRect.getY());
-	    	canvas.lineTo(cellRect.getX() + 5, cellRect.getY());
-	    	canvas.lineTo(cellRect.getX(), cellRect.getY() + 5);
-	    	canvas.closePathFillStroke().restoreState();
-	    	//Fill the undrawn areas with black
-	    	canvas.saveState().setFillColor(ColorConstants.BLACK);
-	    	canvas.moveTo(cellRect.getX(), cellRect.getY());
-	    	canvas.lineTo(cellRect.getX() + 5, cellRect.getY());
-	    	canvas.lineTo(cellRect.getX(), cellRect.getY() + 5);
-	    	canvas.closePathFillStroke().restoreState();
-	        super.draw(drawContext);
-	    }
+		@Override
+		public void draw(DrawContext drawContext) {
+			PdfCanvas canvas = drawContext.getCanvas();
+			canvas.saveState().setFillColor(vColor);
+			Rectangle cellRect = getOccupiedAreaBBox();
+			System.out.println("Drawiing");
+			// Draw the custom Cell
+			canvas.moveTo(cellRect.getX(), cellRect.getY() + cellRect.getHeight());
+			canvas.lineTo(cellRect.getX() + cellRect.getWidth(), cellRect.getY() + cellRect.getHeight());
+			canvas.lineTo(cellRect.getX() + cellRect.getWidth(), cellRect.getY());
+			canvas.lineTo(cellRect.getX() + 5, cellRect.getY());
+			canvas.lineTo(cellRect.getX(), cellRect.getY() + 5);
+			canvas.closePathFillStroke().restoreState();
+			// Fill the undrawn areas with black
+			canvas.saveState().setFillColor(ColorConstants.BLACK);
+			canvas.moveTo(cellRect.getX(), cellRect.getY());
+			canvas.lineTo(cellRect.getX() + 5, cellRect.getY());
+			canvas.lineTo(cellRect.getX(), cellRect.getY() + 5);
+			canvas.closePathFillStroke().restoreState();
+			super.draw(drawContext);
+		}
 	}
-	
+
 //	private Cell createVenueCell(String name, Table table) {
 //		Cell cell = new Cell(1, HOUR * 2);
 //		cell.add(new Paragraph(name).setWidth(table.getColumnWidth(0)).setFontSize(12)
