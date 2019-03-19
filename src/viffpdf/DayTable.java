@@ -29,7 +29,8 @@ public class DayTable {
 				return aName.compareTo(bName);		
 			}
 		});
-		thisHeight = 70 + venueSCTList.size() * venueSCTList.get(0).getHeight();
+
+		thisHeight = (venueSCTList.size() + 2) * venueSCTList.get(0).getHeight();
 	}
 	
 

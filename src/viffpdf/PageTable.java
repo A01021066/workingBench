@@ -6,7 +6,7 @@ public class PageTable {
 	static int dayCount = 0;
 	static int pageCount = 1;
 	int numOfDays = 0;
-	final int maxHeight = 736 * 4;
+	final int maxHeight = 625;
 	int thisHeight = 0;
 	int pageNum;
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
@@ -20,7 +20,7 @@ public class PageTable {
 		if (upperBound > list.size()) {
 			upperBound = list.size();
 		}
-
+		
 		for (int n = dayCount; n < upperBound; n++) {
 			heightCounter += list.get(n).thisHeight;
 			if (heightCounter + list.get(n).thisHeight >= maxHeight) {

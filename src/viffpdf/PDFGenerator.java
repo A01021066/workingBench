@@ -46,6 +46,7 @@ public class PDFGenerator {
 	Color bColor;
 	Color vColor;
 	int masterFont;
+	int rowHeight;
 	PdfFont font;
 
 	ArrayList<PageTable> pageList = new ArrayList<PageTable>();
@@ -120,6 +121,7 @@ public class PDFGenerator {
 		dColor = config.dColor;
 		bColor = config.bColor;
 		vColor = config.vColor;
+		rowHeight = screenTimeList.get(0).thisHeight;
 		switch (config.masterFont) {
 		case 0:
 			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
@@ -171,11 +173,7 @@ public class PDFGenerator {
 				rect.useAllAvailableWidth().setHeight(PAGE_HEIGHT - heightCounter);
 				document.add(rect);
 			}
-//			if (pageList.indexOf(pt) < pageList.size() - 1) {
-//				if ((heightCounter + pageList.get(pageList.indexOf(pt) + 1).thisHeight) > PAGE_HEIGHT) {
-//					continue;
-//				}
-//			}
+
 		}
 		dayCounter = 0;
 		document.close();
@@ -199,6 +197,7 @@ public class PDFGenerator {
 	}
 
 	private Table createSchedule(DayTable table, String date) {
+		System.out.println("Creating table for Day " + table.dayDate);
 		// Counters
 		int column_counter;
 		int table_height_counter = 0;
@@ -235,12 +234,16 @@ public class PDFGenerator {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
 		}
 
+
 		// adding each venue + screentime row
 		for (VenueDateTable vdt : table.venueSCTList) {
 
 			// adding venue cell, same length as the blank space for time grid
 			Cell vdtCell = new Cell(1, HOUR * 2);
+			System.out.println("\tCreating cell for venue: " + vdt.thisVenue.getNameShort());
+			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
 
+			System.out.println("\t\tCalling renderer on venue " + vdt.thisVenue.getNameShort());
 			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0))
 					.setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold()
 					.setFontColor(ColorConstants.BLACK));
@@ -251,7 +254,6 @@ public class PDFGenerator {
 			// TODO do we go with height setting, or font size setting?
 			vdtCell.setHeight(vdt.thisHeight).setBorder(Border.NO_BORDER);
 			vdtCell.setBorderBottom(border).setBorderRight(border);
-			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
 
 			// adding screen times for this row.
 			schedule_table.addCell(vdtCell);
@@ -340,8 +342,8 @@ public class PDFGenerator {
 	 */
 	private Cell createDateCell(int cellWidth, String date) {
 		Cell cell = new Cell(1, cellWidth);
-		cell.add(new Paragraph(date).setFontSize(DATE_FONT_SIZE).setBold().setFontColor(ColorConstants.WHITE)); // ColorConstants
-		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10);
+		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE)); // ColorConstants
+		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10).setHeight(rowHeight);
 		return cell;
 	}
 
@@ -353,7 +355,7 @@ public class PDFGenerator {
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
 		cell.setBorder(Border.NO_BORDER);
-		cell.add(new Paragraph(time)).setFontSize(TIME_FONT_SIZE).setPadding(5).setBold()
+		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold().setHeight(rowHeight)
 				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
@@ -369,7 +371,6 @@ public class PDFGenerator {
 			PdfCanvas canvas = drawContext.getCanvas();
 			canvas.saveState().setFillColor(vColor);
 			Rectangle cellRect = getOccupiedAreaBBox();
-			System.out.println("Drawiing");
 			// Draw the custom Cell
 			canvas.moveTo(cellRect.getX(), cellRect.getY() + cellRect.getHeight());
 			canvas.lineTo(cellRect.getX() + cellRect.getWidth(), cellRect.getY() + cellRect.getHeight());
