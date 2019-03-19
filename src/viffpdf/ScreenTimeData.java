@@ -11,13 +11,12 @@ import java.util.Date;
  * @author Andrew Busto
  *
  */
-public class ScreenTimeData extends RowData
-{
+public class ScreenTimeData extends RowData {
 	/*
-	 * date - The date on which the screening will occur. movieName - The name
-	 * of the movie. movieId - The universal identifier for a movie. sectionCode
-	 * - The code representing the section of the movie. venueCode - The code
-	 * representing the venue showing the movie.
+	 * date - The date on which the screening will occur. movieName - The name of
+	 * the movie. movieId - The universal identifier for a movie. sectionCode - The
+	 * code representing the section of the movie. venueCode - The code representing
+	 * the venue showing the movie.
 	 */
 	private String movieName, movieId, sectionCode, venueCode, pageNum;
 
@@ -25,45 +24,39 @@ public class ScreenTimeData extends RowData
 	private Date date;
 
 	/*
-	 * lengthMin - The length of the movie in minutes. lengthHrs - The length of
-	 * the movie in HHMM. startTime - The start time of the movie in HHMM.
+	 * lengthMin - The length of the movie in minutes. lengthHrs - The length of the
+	 * movie in HHMM. startTime - The start time of the movie in HHMM.
 	 */
 	private int lengthMin, lengthHrs, startTime, startBlock;
 
 	/**
 	 * Constructs a ScreenTime based on an array of relevant data.
 	 * 
-	 * @param data
-	 *            The data to be stored in ScreenTime form. Note - Must be in
-	 *            format {date, movieName, movieId, length(minutes),
-	 *            length(HH:MM:SS), sectionCode, startTime(HH:MM:SS),
-	 *            venueCode, pageNum}.
-	 * @throws IllegalArgumentException
-	 *             Data given Must be in format {date, movieName, movieId,
-	 *             length(minutes), length(HH:MM:SS), sectionCode,
-	 *             startTime(HH:MM:SS), venueCode}.
+	 * @param data The data to be stored in ScreenTime form. Note - Must be in
+	 *             format {date, movieName, movieId, length(minutes),
+	 *             length(HH:MM:SS), sectionCode, startTime(HH:MM:SS), venueCode,
+	 *             pageNum}.
+	 * @throws IllegalArgumentException Data given Must be in format {date,
+	 *                                  movieName, movieId, length(minutes),
+	 *                                  length(HH:MM:SS), sectionCode,
+	 *                                  startTime(HH:MM:SS), venueCode}.
 	 */
-	public ScreenTimeData(ArrayList<String> data) throws IllegalArgumentException
-	{
+	public ScreenTimeData(ArrayList<String> data) throws IllegalArgumentException {
 		setData(data);
 	}
-
 
 	/**
 	 * Updates all data on the screen-time.
 	 * 
-	 * @param data
-	 *            The data to be stored in ScreenTime form. Note - Must be in
-	 *            format {date, movieName, movieId, length(minutes),
-	 *            length(HH:MM:SS), sectionCode, startTime(HH:MM:SS),
-	 *            venueCode}.
-	 * @throws IllegalArgumentException
-	 *             Data given Must be in format {date, movieName, movieId,
-	 *             length(minutes), length(HH:MM:SS), sectionCode,
-	 *             startTime(HH:MM:SS), venueCode}.
+	 * @param data The data to be stored in ScreenTime form. Note - Must be in
+	 *             format {date, movieName, movieId, length(minutes),
+	 *             length(HH:MM:SS), sectionCode, startTime(HH:MM:SS), venueCode}.
+	 * @throws IllegalArgumentException Data given Must be in format {date,
+	 *                                  movieName, movieId, length(minutes),
+	 *                                  length(HH:MM:SS), sectionCode,
+	 *                                  startTime(HH:MM:SS), venueCode}.
 	 */
-	public void setData(ArrayList<String> data) throws IllegalArgumentException
-	{
+	public void setData(ArrayList<String> data) throws IllegalArgumentException {
 		// Ensures a sufficient amount of data is given
 		if (data.size() != 9)
 			throw new IllegalArgumentException(
@@ -72,8 +65,7 @@ public class ScreenTimeData extends RowData
 		super.setData(data);
 
 		// Parses variable's data from the array of data given
-		try
-		{
+		try {
 			date = new SimpleDateFormat("MM/dd/yyyy").parse(data.get(0));
 			movieName = data.get(1);
 			movieId = data.get(2);
@@ -81,16 +73,14 @@ public class ScreenTimeData extends RowData
 			lengthHrs = Integer.parseInt(data.get(4).replace(":", "")) / 100;
 			sectionCode = data.get(5);
 			startTime = Integer.parseInt(data.get(6).replace(":", "")) / 100;
-			startBlock = this.getStartTime() - 570; //9:30 in minutes;
+			startBlock = this.getStartTime() - 570; // 9:30 in minutes;
 			venueCode = data.get(7);
 			pageNum = data.get(8);
-		} catch (NumberFormatException e)
-		{
+		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException(
 					"Rows must be in format " + "{date, movieName, movieId, length(minutes), "
 							+ "length(HH:MM:SS), sectionCode, startTime(HH:MM:SS), venueCode}");
-		} catch (ParseException e)
-		{
+		} catch (ParseException e) {
 			throw new IllegalArgumentException("Date must be in format MM/DD/YY");
 		}
 	}
@@ -100,19 +90,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return date.
 	 */
-	public Date getDate()
-	{
+	public Date getDate() {
 		return date;
 	}
 
 	/**
 	 * Sets date - The date on which the screening will occur.
 	 * 
-	 * @param date
-	 *            The value to set date to.
+	 * @param date The value to set date to.
 	 */
-	public void setDate(Date date)
-	{
+	public void setDate(Date date) {
 		this.date = date;
 		data.set(0, "" + date);
 	}
@@ -122,19 +109,47 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return movieName.
 	 */
-	public String getMovieName()
-	{
+	public String getMovieName() {		
+		if (movieName.length() * 5 > this.getLengthMin()) {
+			movieName = truncateName(movieName);
+			data.set(1, movieName);
+		}
 		return movieName;
+	}
+
+	public String truncateName(String name) {
+		int firstColumn = name.indexOf(":");
+		int firstSlash = name.indexOf("/");
+		int firstDash = name.indexOf("-");
+		int firstComma = name.indexOf(",");
+		int first = name.indexOf(" ");
+		int second = name.indexOf(" ", name.indexOf(" ") + 1);
+		
+		if (firstColumn >= 0) {
+			name = name.substring(0, firstColumn + 1) + "...";
+		} else if (firstSlash >= 0) {
+			name = name.substring(0, firstSlash) + "...";
+		} else if (firstDash >= 0) {
+			name = name.substring(0, firstDash) +"...";
+		} else if (firstComma >= 0) {
+			name = name.substring(0, firstComma) + "...";
+		} else if (second >= 1 && first >= 1) {
+			name = name.substring(0, second) + "...";
+		} else if (second < 0 && first >= 1) {
+			name = name.substring(0, first) + "...";
+		} else {
+			name = name.substring(0, 8);
+		}
+		return name;
 	}
 
 	/**
 	 * Sets movieName - The name of the movie.
 	 * 
-	 * @param movieName
-	 *            The value to set movieName to.
+	 * @param movieName The value to set movieName to.
 	 */
-	public void setMovieName(String movieName)
-	{
+	public void setMovieName(String movieName) {
+
 		this.movieName = movieName;
 		data.set(1, movieName);
 	}
@@ -144,19 +159,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return movieId
 	 */
-	public String getMovieId()
-	{
+	public String getMovieId() {
 		return movieId;
 	}
 
 	/**
 	 * Sets movieId - The universal identifier for a movie.
 	 * 
-	 * @param movieId
-	 *            The value to set movieId to.
+	 * @param movieId The value to set movieId to.
 	 */
-	public void setMovieId(String movieId)
-	{
+	public void setMovieId(String movieId) {
 		this.movieId = movieId;
 		data.set(2, movieId);
 	}
@@ -166,19 +178,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return sectionCode.
 	 */
-	public String getSectionCode()
-	{
+	public String getSectionCode() {
 		return sectionCode;
 	}
 
 	/**
 	 * Sets sectionCode - The code representing the section of the movie.
 	 * 
-	 * @param sectionCode
-	 *            The value to set sectionCode to.
+	 * @param sectionCode The value to set sectionCode to.
 	 */
-	public void setSectionCode(String sectionCode)
-	{
+	public void setSectionCode(String sectionCode) {
 		this.sectionCode = sectionCode;
 		data.set(5, sectionCode);
 	}
@@ -188,19 +197,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return venueCode.
 	 */
-	public String getVenueCode()
-	{
+	public String getVenueCode() {
 		return venueCode;
 	}
 
 	/**
 	 * Sets venueCode - The code representing the venue showing the movie.
 	 * 
-	 * @param venueCode
-	 *            The value to set venueCode to.
+	 * @param venueCode The value to set venueCode to.
 	 */
-	public void setVenueCode(String venueCode)
-	{
+	public void setVenueCode(String venueCode) {
 		this.venueCode = venueCode;
 		data.set(7, venueCode);
 	}
@@ -210,19 +216,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return lengthMin.
 	 */
-	public int getLengthMin()
-	{
+	public int getLengthMin() {
 		return lengthMin;
 	}
 
 	/**
 	 * Sets lengthMin - The length of the movie in minutes.
 	 * 
-	 * @param lengthMin
-	 *            The value to set lengthMin to.
+	 * @param lengthMin The value to set lengthMin to.
 	 */
-	public void setLengthMin(int lengthMin)
-	{
+	public void setLengthMin(int lengthMin) {
 		this.lengthMin = lengthMin;
 		data.set(3, "" + lengthMin);
 	}
@@ -232,19 +235,16 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return lengthHrs.
 	 */
-	public int getLengthHrs()
-	{
+	public int getLengthHrs() {
 		return lengthHrs;
 	}
 
 	/**
 	 * Sets lengthHrs - The length of the movie in HHMM.
 	 * 
-	 * @param lengthHrs
-	 *            The value to set lengthHrs to.
+	 * @param lengthHrs The value to set lengthHrs to.
 	 */
-	public void setLengthHrs(int lengthHrs)
-	{
+	public void setLengthHrs(int lengthHrs) {
 		this.lengthHrs = lengthHrs;
 		data.set(4, "" + lengthHrs);
 	}
@@ -254,39 +254,35 @@ public class ScreenTimeData extends RowData
 	 * 
 	 * @return the start time in minutes
 	 */
-	public int getStartTime()
-	{
+	public int getStartTime() {
 		int hours = startTime / 100;
 		int minutes = startTime % 100 + (hours * 60);
 		return minutes;
 
 	}
-	
+
 	public int getStartBlock() {
 		return startBlock;
 	}
 
 	/**
-	 * Gets the time details of the screening in XX:XXpm/XXX min format to
-	 * display under the Screen title
+	 * Gets the time details of the screening in XX:XXpm/XXX min format to display
+	 * under the Screen title
 	 * 
 	 * @return the start time in minutes
 	 */
-	public String getTimeDetails()
-	{
+	public String getTimeDetails() {
 		int hours = startTime / 100;
 		int minutes = (startTime % 100);
 		String stringMin = minutes + "";
 		String amPm = "am";
 		String pageNumber = this.pageNum;
-		if (hours >= 12)
-		{
+		if (hours >= 12) {
 			amPm = "pm";
 			if (hours != 12)
 				hours -= 12;
 		}
-		if (minutes < 10)
-		{
+		if (minutes < 10) {
 			stringMin = "0" + minutes;
 		}
 		String result = hours + ":" + stringMin + amPm + " " + lengthMin + "min p" + pageNum;
@@ -299,29 +295,24 @@ public class ScreenTimeData extends RowData
 	/**
 	 * Sets startTime - The start time of the movie in HHMM.
 	 * 
-	 * @param startTime
-	 *            The value to set startTime to.
+	 * @param startTime The value to set startTime to.
 	 */
-	public void setStartTime(int startTime)
-	{
+	public void setStartTime(int startTime) {
 		this.startTime = startTime;
 		data.set(6, "" + startTime);
 	}
-	
-	public void setPageNum(String pageNumber)
-	{
+
+	public void setPageNum(String pageNumber) {
 		this.pageNum = pageNumber;
 		data.set(8, pageNumber);
 	}
-	
-	public String getPageNum()
-	{
+
+	public String getPageNum() {
 		return this.pageNum;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		return this.movieName;
 	}
-	
+
 }

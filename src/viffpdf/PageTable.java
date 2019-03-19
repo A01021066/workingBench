@@ -6,7 +6,7 @@ public class PageTable {
 	static int dayCount = 0;
 	static int pageCount = 1;
 	int numOfDays = 0;
-	final int maxHeight = 625;
+	final int maxHeight = 736;
 	int thisHeight = 0;
 	int pageNum;
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
@@ -22,9 +22,8 @@ public class PageTable {
 		}
 		
 		for (int n = dayCount; n < upperBound; n++) {
-			heightCounter += list.get(n).thisHeight;
-			if (heightCounter + list.get(n).thisHeight >= maxHeight) {
-				upperBound = n;
+			heightCounter += list.get(n).thisHeight + 5;
+			if (heightCounter >= maxHeight) {
 				Status.print("Too many days within one page. Emitting days on ***PAGE " + pageNum + "***." );
 				break;
 			}
