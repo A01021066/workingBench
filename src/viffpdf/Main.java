@@ -47,7 +47,7 @@ public class Main extends Application {
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
-	static TextField rowHeightConfigInput = new TextField("9");
+	static TextField rowHeightConfigInput = new TextField("12.6");
 	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
@@ -139,7 +139,7 @@ public class Main extends Application {
 		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
 		for (int n = 2; n < 10; n++) {
 			NumField textField = new NumField();
-			String defTxt = (n<6)? "4": "0";
+			String defTxt = (n<10)? "4": "0";
 			textField.setText(defTxt);
 			textField.setId(varNames[n - 2]);
 			pageSettingLayOut.add(textField, 6, n);
@@ -394,7 +394,7 @@ public class Main extends Application {
 		fontTitle.setStyle("-fx-font-weight: bold");
 
 		Text fontFace = new Text("Font");
-		ObservableList<String> fonts = FXCollections.observableArrayList("Times Roman", "Helvetica", "Courier");
+		ObservableList<String> fonts = FXCollections.observableArrayList("Helvetica","Times Roman", "Courier");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
 		fontBox.getSelectionModel().selectFirst();
 
@@ -464,7 +464,7 @@ public class Main extends Application {
 						// a specific date(unique to object)
 						// an arraylist of sct data(all of the movies shown on this venue at this date)
 						
-						VenueDateTable vdtEntry = new VenueDateTable(vt, d, Integer.parseInt(rowHeightConfigInput.getText()));
+						VenueDateTable vdtEntry = new VenueDateTable(vt, d, Float.parseFloat(rowHeightConfigInput.getText()));
 						if (checkEmpty.isSelected()) {
 							if (!vdtEntry.thisVDT.isEmpty()) {
 								VDTList.add(vdtEntry);

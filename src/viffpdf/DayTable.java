@@ -8,7 +8,7 @@ import java.util.Date;
 public class DayTable {
 
 	static int count = 0;
-	int thisHeight = 0;
+	float thisHeight = 0;
 	Date dayDate;
 	ArrayList<VenueDateTable> venueSCTList = new ArrayList<VenueDateTable>();
 	

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -43,7 +44,7 @@ public class PDFGenerator {
 	Color bColor;
 	Color vColor;
 	int masterFont;
-	int rowHeight;
+	float rowHeight;
 	PdfFont font;
 
 	ArrayList<PageTable> pageList = new ArrayList<PageTable>();
@@ -52,7 +53,6 @@ public class PDFGenerator {
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
 	ArrayList<Date> dateList = new ArrayList<Date>();
 	// Used to specify the amount of cells in a row and the weight of each cell
-	private float[] tableCellNumbers;
 
 	// margin spaces between tables on the document
 	private final int TABLE_MARGIN = 5;
@@ -106,12 +106,12 @@ public class PDFGenerator {
 		rowHeight = screenTimeList.get(0).thisHeight;
 		switch (config.masterFont) {
 		case 0:
-			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
+			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 			// http://itextsupport.com/apidocs/itext7/7.1.1/com/itextpdf/io/font/constants/StandardFonts.html
 			// black magic
 			break;
 		case 1:
-			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
 			break;
 		case 2:
 			font = PdfFontFactory.createFont(StandardFonts.COURIER);
@@ -136,10 +136,9 @@ public class PDFGenerator {
 		pdf.addEventHandler(PdfDocumentEvent.START_PAGE, new PageBackgroundsEventHandler());
 		Document document = new Document(pdf, new PageSize(PAGE_WIDTH, PAGE_HEIGHT).rotate());
 		document.setFontProvider(document.getFontProvider());
-		document.setMargins(5,5,5,5);
-		SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
-		tableCellNumbers = new float[number_of_columns];
-		Arrays.fill(tableCellNumbers, 1.0f);
+		document.setMargins(5,5,0,5);
+		SimpleDateFormat fmt = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd", Locale.US);
+
 
 		// draw each page we have in the data.
 		for (PageTable pt : pageList) {
@@ -186,6 +185,7 @@ public class PDFGenerator {
 		int number_of_columns = 1080;
 		int max_table_width = 960;
 
+	
 		// list of times
 		String[] times = { "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00",
 				"20:00", "21:00", "22:00", "23:00", "00:00", "01:00" };
@@ -223,13 +223,13 @@ public class PDFGenerator {
 			System.out.println("\t\tCalling renderer on venue " + vdt.thisVenue.getNameShort());
 			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0))
 					.setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold()
-					.setFontColor(ColorConstants.BLACK));
+					.setFontColor(ColorConstants.BLACK)).setPadding(0).setMargin(0);
 			vdtCell.setTextAlignment(TextAlignment.CENTER)/* .setBackgroundColor(vColor) */;
 			vdtCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 			vdtCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 
 			// TODO do we go with height setting, or font size setting?
-			vdtCell.setHeight(vdt.thisHeight).setBorder(Border.NO_BORDER);
+			vdtCell.setHeight(rowHeight).setBorder(Border.NO_BORDER);
 			vdtCell.setBorderBottom(Border.NO_BORDER);
 
 			// adding screen times for this row.
@@ -249,7 +249,7 @@ public class PDFGenerator {
 					if (minCounter % QUARTER_HOUR != 0)
 					{
 						Cell emptyCell = new Cell(1, 15 - minCounter % 15).setPadding(0).setMargin(0).setBorder(Border.NO_BORDER).setBorderTop(border).setBorderBottom(border);
-						emptyCell.setHeight(vdt.thisHeight);
+						emptyCell.setHeight(rowHeight);
 
 						if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 							emptyCell.setBackgroundColor(ColorConstants.GRAY);
@@ -271,7 +271,7 @@ public class PDFGenerator {
 					
 					
 						Cell emptyCell = new Cell(1, 15).setPadding(0).setMargin(0);
-						emptyCell.setHeight(vdt.thisHeight);
+						emptyCell.setHeight(rowHeight);
 						emptyCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER).setBorderRight(Border.NO_BORDER);
 						emptyCell.setBorder(Border.NO_BORDER);
 						if (minCounter == 30 || (minCounter - 30) % HOUR == 0) {
@@ -299,14 +299,14 @@ public class PDFGenerator {
 
 				// after the initial blank space. Add in the movie show time block.
 				Cell sctCell = new Cell(1, sct.getLengthMin());
-				sctCell.setHeight(vdt.thisHeight).setPadding(0).setMargin(0).setMaxWidth(0); // the setMaxWidth(0) fixed
+				sctCell.setHeight(rowHeight).setPadding(0).setMargin(0).setMaxWidth(0); // the setMaxWidth(0) fixed
 																								// the streching issue.
 																								// Black magic.
 				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
 						.setBorderRight(Border.NO_BORDER);
 
 				sctCell.add(new Paragraph(sct.getMovieName()).setFontSize(venueFontSize).setFont(font)
-						.setFontColor(ColorConstants.BLACK).setTextAlignment(TextAlignment.CENTER));
+						.setFontColor(ColorConstants.BLACK).setTextAlignment(TextAlignment.CENTER).setPadding(0).setMargin(0));
 				sctCell.setBackgroundColor(dColor).setPadding(0);
 				sctCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 				sctCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -321,7 +321,7 @@ public class PDFGenerator {
 				if (minCounter % QUARTER_HOUR != 0)
 				{
 					Cell fillCell = new Cell(1, 15 - minCounter % 15).setPadding(0).setMargin(0).setBorder(Border.NO_BORDER).setBorderTop(border).setBorderBottom(border);
-					fillCell.setHeight(vdt.thisHeight);
+					fillCell.setHeight(rowHeight);
 
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						fillCell.setBackgroundColor(ColorConstants.GRAY);
@@ -342,7 +342,7 @@ public class PDFGenerator {
 				}
 				
 				Cell fillCell = new Cell(1, 15).setPadding(0).setMargin(0);
-				fillCell.setHeight(vdt.thisHeight);
+				fillCell.setHeight(rowHeight);
 				fillCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER).setBorderRight(Border.NO_BORDER);
 				fillCell.setBorder(Border.NO_BORDER);
 				if (minCounter == 30 || (minCounter - 30) % HOUR == 0) {
@@ -382,10 +382,10 @@ public class PDFGenerator {
 	 */
 	private Cell createDateCell(int cellWidth, String date) {
 		Cell cell = new Cell(1, cellWidth);
-		cell.setHeight(13);
+		cell.setHeight(rowHeight);
 		cell.setBorder(Border.NO_BORDER);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE)); // ColorConstants
+		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE).setPadding(0).setMargin(0)); // ColorConstants
 		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10);
 		return cell;
 	}
@@ -398,8 +398,10 @@ public class PDFGenerator {
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
 		cell.setBorder(Border.NO_BORDER);
-		cell.setHeight(13);
-		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold()
+		cell.setHeight(rowHeight);
+		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold().setPadding(0).setMargin(0)
 				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
@@ -444,11 +446,11 @@ public class PDFGenerator {
 
 //	private Table createVDTRow(VenueDateTable vdt, int index) {
 //		Table vdtRow = new Table(number_of_columns);
-//		vdtRow.useAllAvailableWidth().setHeight(vdt.thisHeight);
+//		vdtRow.useAllAvailableWidth().setHeight(vdt.rowHeight);
 //		Cell venue = createVenueCell(vdt.thisVenue.getNameShort(), vdtRow);
-//		venue.setHeight(vdt.thisHeight);
+//		venue.setHeight(vdt.rowHeight);
 //		vdtRow.addCell(venue);
-//		vdtRow.setHeight(vdt.thisHeight);
+//		vdtRow.setHeight(vdt.rowHeight);
 //
 //		for (int i = 0; i < 16; i++) {
 //			Cell screenTime = new Cell(1, 1);

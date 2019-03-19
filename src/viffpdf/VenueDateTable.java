@@ -6,11 +6,11 @@ import java.util.HashMap;
 
 public class VenueDateTable {
 	VenueData thisVenue;
-	int thisHeight;
+	float thisHeight;
 	Date thisDate;
 	ArrayList<ScreenTimeData> thisVDT = new ArrayList<ScreenTimeData>();
 
-	public VenueDateTable(VenueTable venue, Date date, int height) {
+	public VenueDateTable(VenueTable venue, Date date, float height) {
 		if (venue != null) {
 			thisVenue = venue.thisVenue;
 			thisDate = date;
@@ -35,7 +35,7 @@ public class VenueDateTable {
 		return temp;
 	}
 	
-	public int getHeight() {
+	public float getHeight() {
 		return thisHeight;
 	}
 }
