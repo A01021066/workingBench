@@ -63,11 +63,11 @@ public class PDFGenerator {
 	/**
 	 * Constant for the value of the PDF's page width.
 	 */
-	private static final int PAGE_WIDTH = 651;
+	private static final float PAGE_WIDTH = 651;
 	/**
 	 * Constant for the value of the PDF's page height.
 	 */
-	private static final int PAGE_HEIGHT = 736;
+	private static final float PAGE_HEIGHT = 736;
 
 	/**
 	 * Constant for 15 minutes.
@@ -140,7 +140,7 @@ public class PDFGenerator {
 
 		// draw each page we have in the data.
 		for (PageTable pt : pageList) {
-			int heightCounter = 0;
+			float heightCounter = 0;
 			for (int i = 0; i < pt.numOfDays; i++) {
 				Table dayTable = createSchedule(pt.dayList.get(i), fmt.format(pt.dayList.get(i).dayDate));
 				document.add(dayTable);
@@ -148,12 +148,16 @@ public class PDFGenerator {
 
 			}
 			// if the page's content isn't large enough to make the whole page.
-			if (pt.thisHeight <= PAGE_HEIGHT) {
+			if (pt.thisHeight <= PAGE_WIDTH) {
 				Table rect = new Table(number_of_columns);
-				rect.useAllAvailableWidth().setHeight(PAGE_HEIGHT - pt.thisHeight);
-				rect.setBackgroundColor(ColorConstants.WHITE);
+				rect.useAllAvailableWidth().setHeight(PAGE_WIDTH - pt.thisHeight);
+				rect.setBackgroundColor(ColorConstants.BLACK);
+				heightCounter += (PAGE_WIDTH - pt.thisHeight);
 				document.add(rect);
 			}
+			
+			System.out.println("Page height counter: " + pt.thisHeight);
+			System.out.println(PAGE_WIDTH);
 		}
 		
 		document.close();
@@ -175,7 +179,8 @@ public class PDFGenerator {
 
 	private Table createSchedule(DayTable table, String date) {
 		//System.out.println("Creating table for Day " + table.dayDate);
-		// Counters
+
+		float heightCounter = 0;
 		SolidBorder border = new SolidBorder(1.0f);
 		Border evenRightGrid = new DottedBorder(ColorConstants.GRAY, 0.5f, 1.0f);
 		Border evenLeftGrid = new DottedBorder(ColorConstants.GRAY, 0.85f, 1.0f);
@@ -200,12 +205,14 @@ public class PDFGenerator {
 		schedule_table.setBorder(Border.NO_BORDER);
 		// adding date at the top
 		schedule_table.addHeaderCell(createDateCell(number_of_columns, date));
+		heightCounter += rowHeight;
 		Cell cell;
 
 		// adding the blank space left on the time gird row
 		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0).setBorder(Border.NO_BORDER);
 		schedule_table.addHeaderCell(cell);
-
+		heightCounter += rowHeight;
+		
 		// adding the time grid
 		for (int i = 0; i < times.length; i++) {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
@@ -213,9 +220,9 @@ public class PDFGenerator {
 
 		// adding each venue + screentime row
 		for (VenueDateTable vdt : table.venueSCTList) {
-
+			heightCounter += rowHeight;
 			// adding venue cell, same length as the blank space for time grid
-			Cell vdtCell = new Cell(1, HOUR * 2);;
+			Cell vdtCell = new Cell(1, HOUR * 2);
 			vdtCell.setKeepTogether(true);
 			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
 			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0))
@@ -228,6 +235,7 @@ public class PDFGenerator {
 			// TODO do we go with height setting, or font size setting?
 			vdtCell.setHeight(rowHeight).setBorder(Border.NO_BORDER);
 			vdtCell.setBorderBottom(Border.NO_BORDER);
+			System.out.println("Row Height: "  + vdtCell.getHeight());
 
 			// adding screen times for this row.
 			schedule_table.addCell(vdtCell);
@@ -434,6 +442,7 @@ public class PDFGenerator {
 			schedule_table.startNewRow();
 		}
 
+		System.out.println("Day Height: " + heightCounter);
 		return schedule_table;
 	}
 

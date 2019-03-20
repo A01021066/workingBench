@@ -14,7 +14,6 @@ public class DayTable {
 	
 	public DayTable(ArrayList<VenueDateTable> list, Date date) {
 		dayDate = date;
-//		Status.print("Generating Day Table for: " + dayDate);
 		for(VenueDateTable vdtEntry : list) {
 			if (vdtEntry.thisDate.equals(date)) {
 				venueSCTList.add(vdtEntry);
@@ -31,6 +30,7 @@ public class DayTable {
 		});
 
 		thisHeight = (venueSCTList.size() + 2) * venueSCTList.get(0).getHeight() + 3;
+		System.out.println("Day Height for " + dayDate + " is: " + thisHeight);
 	}
 	
 
