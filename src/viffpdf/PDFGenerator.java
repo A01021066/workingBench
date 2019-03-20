@@ -56,7 +56,7 @@ public class PDFGenerator {
 	// Used to specify the amount of cells in a row and the weight of each cell
 
 	// margin spaces between tables on the document
-	private final int TABLE_MARGIN = 5;
+	private final int TABLE_MARGIN = 3;
 
 	private final int number_of_columns = 1080;
 
@@ -151,7 +151,7 @@ public class PDFGenerator {
 			if (pt.thisHeight <= PAGE_HEIGHT) {
 				Table rect = new Table(number_of_columns);
 				rect.useAllAvailableWidth().setHeight(PAGE_HEIGHT - pt.thisHeight);
-				rect.setBackgroundColor(ColorConstants.BLACK);
+				rect.setBackgroundColor(ColorConstants.WHITE);
 				document.add(rect);
 			}
 		}
@@ -194,6 +194,7 @@ public class PDFGenerator {
 		Table schedule_table = new Table(number_of_columns);
 		// prevent table from spliting.
 		schedule_table.setKeepTogether(true);
+		
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setMarginBottom(TABLE_MARGIN);
 		schedule_table.setBorder(Border.NO_BORDER);
@@ -215,6 +216,7 @@ public class PDFGenerator {
 
 			// adding venue cell, same length as the blank space for time grid
 			Cell vdtCell = new Cell(1, HOUR * 2);;
+			vdtCell.setKeepTogether(true);
 			vdtCell.setNextRenderer(new FoldedBorderCellRenderer(vdtCell));
 			vdtCell.add(new Paragraph(vdt.thisVenue.getNameShort()).setWidth(schedule_table.getColumnWidth(0))
 					.setFontSize(venueFontSize).setFont(font).setTextAlignment(TextAlignment.CENTER).setBold()
@@ -246,6 +248,7 @@ public class PDFGenerator {
 								.setBorder(Border.NO_BORDER).setBorderTop(border).setBorderBottom(border);
 						emptyCell.setHeight(rowHeight);
 						emptyCell.setMargin(0);
+						emptyCell.setKeepTogether(true);
 
 						if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 							emptyCell.setBackgroundColor(ColorConstants.GRAY);
@@ -274,7 +277,8 @@ public class PDFGenerator {
 					}
 
 					Cell emptyCell = new Cell(1, 15).setPadding(0).setMargin(0);
-					emptyCell.setMargin(-5f);
+					emptyCell.setMargin(0);
+					emptyCell.setKeepTogether(true);
 
 
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
@@ -318,6 +322,7 @@ public class PDFGenerator {
 				sctCell.setHeight(rowHeight).setPadding(0).setMargin(0).setMaxWidth(0); // the setMaxWidth(0) fixed
 																						// the streching issue.
 																						// Black magic.
+				sctCell.setKeepTogether(true);
 				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
 						.setBorderRight(Border.NO_BORDER);
 
@@ -367,6 +372,7 @@ public class PDFGenerator {
 					Cell fillCell = new Cell(1, 15 - minCounter % 15).setPadding(0).setMargin(0)
 							.setBorder(Border.NO_BORDER).setBorderTop(border).setBorderBottom(border);
 					fillCell.setHeight(rowHeight);
+					fillCell.setKeepTogether(true);
 
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						fillCell.setBackgroundColor(ColorConstants.GRAY);
@@ -399,6 +405,7 @@ public class PDFGenerator {
 				fillCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
 						.setBorderRight(Border.NO_BORDER);
 				fillCell.setBorder(Border.NO_BORDER);
+				fillCell.setKeepTogether(true);
 				if (minCounter == 30 || (minCounter - 30) % HOUR == 0) {
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						fillCell.setBorderLeft(evenLeftGrid);
@@ -438,6 +445,7 @@ public class PDFGenerator {
 	private Cell createDateCell(int cellWidth, String date) {
 		Cell cell = new Cell(1, cellWidth);
 		cell.setHeight(rowHeight);
+		cell.setKeepTogether(true);
 		cell.setBorder(Border.NO_BORDER);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE)
@@ -453,6 +461,7 @@ public class PDFGenerator {
 	 */
 	private Cell createTimeCell(String time) {
 		Cell cell = new Cell(1, HOUR);
+		cell.setKeepTogether(true);
 		cell.setBorder(Border.NO_BORDER);
 		cell.setHeight(rowHeight);
 		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);

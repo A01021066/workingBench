@@ -30,7 +30,7 @@ public class DayTable {
 			}
 		});
 
-		thisHeight = (venueSCTList.size() + 2) * venueSCTList.get(0).getHeight();
+		thisHeight = (venueSCTList.size() + 2) * venueSCTList.get(0).getHeight() + 3;
 	}
 	
 
