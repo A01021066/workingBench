@@ -9,7 +9,7 @@ public class ColorParser extends Parser {
 	private HashMap<String, ColorData> colorMap = new HashMap<String, ColorData>();
 
 	/**
-	 * Default constructor for colorTab. Constructs a colorTab object in an
+	 * Default constructor for colorData. Constructs a colorData object in an
 	 * invalid state.
 	 */
 	public ColorParser() {
@@ -53,4 +53,7 @@ public class ColorParser extends Parser {
 		return message;
 	}
 
+	public HashMap<String, ColorData> getColorMap(){
+		return colorMap;
+	}
 }

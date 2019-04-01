@@ -19,6 +19,7 @@ public class ScreenTimeData extends RowData {
 	 * the venue showing the movie.
 	 */
 	private String movieName, movieId, sectionCode, venueCode, pageNum;
+	
 
 	// date - The date on which the screening will occur.
 	private Date date;

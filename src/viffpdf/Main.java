@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
+import java.util.TreeMap;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -69,6 +69,8 @@ public class Main extends Application {
 	ArrayList<DayTable> DList = new ArrayList<DayTable>();
 	ArrayList<PageTable> PList = new ArrayList<PageTable>();
 	ArrayList<Date> dateList = new ArrayList<Date>();
+	HashMap<String, ColorData> colorList;
+	TreeMap<String, SectionData> sectionList;
 	private ArrayList<Button> fileTypes = new ArrayList<Button>(4);
 	private ArrayList<Parser> parsers = new ArrayList<Parser>(4);
 	private ArrayList<Text> fileStats = new ArrayList<Text>(4);
@@ -93,7 +95,6 @@ public class Main extends Application {
 
 			try {
 				Parser parser = parsers.get(fileType);
-
 				Status.print("Loading: " + parser.getFileType());
 				Status.print(parser.setData(file) + parser.getFileType() + " file opened properly!");
 				fileStats.get(fileType).setText("Passed");
@@ -431,6 +432,13 @@ public class Main extends Application {
 
 				// get the Venue datas from the VenueParser.
 				HashMap<String, VenueData> venueList = ((VenueParser) parsers.get(2)).getVenueList();
+				colorList = ((ColorParser) parsers.get(1)).getColorMap();
+				Iterator<Map.Entry<String, ColorData>> itt = colorList.entrySet().iterator();
+					while (itt.hasNext()) {
+					Map.Entry<String, ColorData> e = (Map.Entry<String, ColorData>) itt.next();
+					System.out.println(e.getValue().getColor());
+				}
+				sectionList = ((SectionParser) parsers.get(0)).getSectionList();
 				// we need the iterator.
 				Iterator<Map.Entry<String, VenueData>> it = venueList.entrySet().iterator();
 
@@ -515,7 +523,7 @@ public class Main extends Application {
 
 				}
 
-				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList);
+				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList, colorList, sectionList);
 				masterFont = fonts.indexOf(fontBox.getValue());
 
 				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, masterFont);

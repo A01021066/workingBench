@@ -66,9 +66,9 @@ public class ScreenTimeParser extends Parser
 			{
 				ScreenTimeData st = new ScreenTimeData(screenTimeData);
 
-				//if (st.getSectionCode().isEmpty()) {
-//					message += "Warning: Section code missing in " + "\n\tTitle:\t" + st.getMovieName() + "\n\tId:\t"
-//							+ st.getMovieId() + "\n\tRow:\t" + i + "\n";}
+				if (st.getSectionCode().isEmpty()) {
+					message += "Warning: Section code missing in " + "\n\tTitle:\t" + st.getMovieName() + "\n\tId:\t"
+							+ st.getMovieId() + "\n\tRow:\t" + i + "\n";}
 
 				screenTimeList.add(new ScreenTimeData(screenTimeData));
 			} catch (IllegalArgumentException e)

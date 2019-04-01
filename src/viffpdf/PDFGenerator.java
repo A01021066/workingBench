@@ -7,7 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Locale;
+import java.util.TreeMap;
 
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
@@ -38,6 +41,7 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import com.itextpdf.layout.renderer.CellRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
 
+
 public class PDFGenerator {
 	String destPath;
 	int venueFontSize;
@@ -53,6 +57,8 @@ public class PDFGenerator {
 	ArrayList<VenueDateTable> screenTimeList = new ArrayList<VenueDateTable>();
 	ArrayList<DayTable> dayList = new ArrayList<DayTable>();
 	ArrayList<Date> dateList = new ArrayList<Date>();
+	HashMap<String, ColorData> colorList;
+	TreeMap<String, SectionData> sectionList;
 	// Used to specify the amount of cells in a row and the weight of each cell
 
 	// margin spaces between tables on the document
@@ -103,6 +109,8 @@ public class PDFGenerator {
 		bColor = config.bColor;
 		vColor = config.vColor;
 		rowHeight = screenTimeList.get(0).thisHeight;
+		colorList = table.colorList;
+		sectionList = table.sectionList;
 		switch (config.masterFont) {
 		case 0:
 			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -155,11 +163,11 @@ public class PDFGenerator {
 				heightCounter += (PAGE_WIDTH - pt.thisHeight);
 				document.add(rect);
 			}
-			
+
 			System.out.println("Page height counter: " + pt.thisHeight);
 			System.out.println(PAGE_WIDTH);
 		}
-		
+
 		document.close();
 	}
 
@@ -178,7 +186,7 @@ public class PDFGenerator {
 	}
 
 	private Table createSchedule(DayTable table, String date) {
-		//System.out.println("Creating table for Day " + table.dayDate);
+		// System.out.println("Creating table for Day " + table.dayDate);
 
 		float heightCounter = 0;
 		SolidBorder border = new SolidBorder(1.0f);
@@ -199,7 +207,7 @@ public class PDFGenerator {
 		Table schedule_table = new Table(number_of_columns);
 		// prevent table from spliting.
 		schedule_table.setKeepTogether(true);
-		
+
 		schedule_table.useAllAvailableWidth().setTextAlignment(TextAlignment.CENTER)
 				.setHorizontalAlignment(HorizontalAlignment.CENTER).setMarginBottom(TABLE_MARGIN);
 		schedule_table.setBorder(Border.NO_BORDER);
@@ -212,7 +220,7 @@ public class PDFGenerator {
 		cell = new Cell(1, HOUR * 2).setBackgroundColor(bColor).setPadding(0).setBorder(Border.NO_BORDER);
 		schedule_table.addHeaderCell(cell);
 		heightCounter += rowHeight;
-		
+
 		// adding the time grid
 		for (int i = 0; i < times.length; i++) {
 			schedule_table.addHeaderCell(createTimeCell(times[i]));
@@ -235,7 +243,7 @@ public class PDFGenerator {
 			// TODO do we go with height setting, or font size setting?
 			vdtCell.setHeight(rowHeight).setBorder(Border.NO_BORDER);
 			vdtCell.setBorderBottom(Border.NO_BORDER);
-			System.out.println("Row Height: "  + vdtCell.getHeight());
+			System.out.println("Row Height: " + vdtCell.getHeight());
 
 			// adding screen times for this row.
 			schedule_table.addCell(vdtCell);
@@ -288,7 +296,6 @@ public class PDFGenerator {
 					emptyCell.setMargin(0);
 					emptyCell.setKeepTogether(true);
 
-
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						emptyCell.setBackgroundColor(ColorConstants.GRAY);
 					} else {
@@ -331,32 +338,43 @@ public class PDFGenerator {
 																						// the streching issue.
 																						// Black magic.
 				sctCell.setKeepTogether(true);
+//				Border coloredBorder = new SolidBorder(5);
+//				if (colorList.containsKey(sct.getSectionCode())) {
+//					System.out.println(sct.getMovieName());
+//					coloredBorder.setColor(colorList.get(sct.getSectionCode()).getColor());
+//				} else {
+//					coloredBorder.setColor(dColor);
+//				}
 				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
 						.setBorderRight(Border.NO_BORDER);
-
+				if (colorList.containsKey(sct.getSectionCode())) {
+					sctCell.setNextRenderer(
+							new ColoredCellRenderer(sctCell, colorList.get(sct.getSectionCode()).getColor()));
+				} else {
+					sctCell.setBackgroundColor(dColor);
+				}
 				Paragraph p = new Paragraph();
 				p.setPadding(0).setMargin(0);
-				
+
 				Text name = new Text(sct.getMovieName());
-				name.setFontSize(venueFontSize - 2).setFont(font)
-				.setFontColor(ColorConstants.BLACK).setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
-				
-				Text time = new Text( "\n" + sct.getTimeDetails());
-				time.setFontSize(venueFontSize - 3f).setFont(font)
-				.setFontColor(ColorConstants.DARK_GRAY).setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
+				name.setFontSize(venueFontSize - 2).setFont(font).setFontColor(ColorConstants.BLACK)
+						.setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
+
+				Text time = new Text("\n" + sct.getTimeDetails());
+				time.setFontSize(venueFontSize - 3f).setFont(font).setFontColor(ColorConstants.DARK_GRAY)
+						.setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
 				p.add(name);
 				p.add(time);
-				
-				
+
 				sctCell.add(p);
-				
+
 				if (minCounter == 30 || (minCounter - 30) % HOUR == 0) {
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
 						sctCell.setBorderLeft(evenLeftGrid);
-						//sctCell.setBorderRight(evenRightGrid);
+						// sctCell.setBorderRight(evenRightGrid);
 					} else {
 						sctCell.setBorderLeft(oddLeftGrid);
-						//sctCell.setBorderRight(oddRightGrid);
+						// sctCell.setBorderRight(oddRightGrid);
 					}
 				} else if ((minCounter + sct.getLengthMin()) % 15 == 0) {
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
@@ -365,7 +383,7 @@ public class PDFGenerator {
 						sctCell.setBorderRight(oddRightGrid);
 					}
 				}
-				sctCell.setBackgroundColor(dColor).setPadding(0).setMargin(0);
+				sctCell.setPadding(0).setMargin(0);
 				sctCell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 				sctCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 				minCounter += sct.getLengthMin();
@@ -503,6 +521,36 @@ public class PDFGenerator {
 			canvas.moveTo(cellRect.getX(), cellRect.getY());
 			canvas.lineTo(cellRect.getX() + 5, cellRect.getY());
 			canvas.lineTo(cellRect.getX(), cellRect.getY() + 5);
+			canvas.closePathFillStroke().restoreState();
+			super.draw(drawContext);
+		}
+	}
+
+	// precious colored bar
+	private class ColoredCellRenderer extends CellRenderer {
+		private Color color;
+
+		public ColoredCellRenderer(Cell modelElement, Color color) {
+			super(modelElement);
+			this.color = color;
+		}
+
+		@Override
+		public void draw(DrawContext drawContext) {
+			PdfCanvas canvas = drawContext.getCanvas();
+			canvas.saveState().setFillColor(color).setStrokeColor(color);
+			Rectangle cellRect = getOccupiedAreaBBox();
+			// Draw the custom Cell
+			canvas.rectangle(cellRect.getX() + cellRect.getWidth() - 2, cellRect.getY() + 0.5, 2,
+					cellRect.getHeight() - 1);
+			canvas.fillStroke().restoreState();
+			// Fill the undrawn areas with black
+			canvas.saveState().setFillColor(dColor).setStrokeColor(dColor);
+			
+			canvas.moveTo(cellRect.getX(), cellRect.getY() - 0.5);
+			canvas.lineTo(cellRect.getX() + cellRect.getWidth() - 2, cellRect.getY() - 0.5);
+			canvas.lineTo(cellRect.getX() + cellRect.getWidth() - 2, cellRect.getY() - 0.5 + cellRect.getHeight());
+			canvas.lineTo(cellRect.getX(), cellRect.getY() + cellRect.getHeight() - 0.5);
 			canvas.closePathFillStroke().restoreState();
 			super.draw(drawContext);
 		}
