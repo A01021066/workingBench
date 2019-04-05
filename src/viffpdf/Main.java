@@ -40,17 +40,29 @@ public class Main extends Application {
 	static Rectangle dayHeaderColor = new Rectangle(20, 20);
 	static Rectangle backgroundColor = new Rectangle(20, 20);
 	static Rectangle venueColor = new Rectangle(20, 20);
-	static TextField minPerPxlField;
+	static Rectangle screenTimeColor = new Rectangle(20, 20);
+	static Rectangle dayHeaderTextColor = new Rectangle(20, 20);
+	static Rectangle fontColor = new Rectangle(20, 20);
 	static TextField dayHeaderCode = new TextField();
 	static TextField backgroundCode = new TextField();
 	static TextField venueCode = new TextField();
+	static TextField screenTimeCode = new TextField();
+	static TextField fontCode = new TextField();
+	static TextField dayHeaderTextCode = new TextField();
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
-	static TextField rowHeightConfigInput = new TextField("13.1");
+	static javafx.scene.paint.Color sColor;
+	static javafx.scene.paint.Color hColor;
+	static javafx.scene.paint.Color fColor;
 	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
+	static com.itextpdf.kernel.colors.Color sColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
+	static com.itextpdf.kernel.colors.Color fColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
+	static com.itextpdf.kernel.colors.Color hColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
+
+	static TextField rowHeightConfigInput = new TextField("13.1");
 	static Text colorStat;
 	static Text sectionStat;
 	static Text venueStat;
@@ -281,9 +293,12 @@ public class Main extends Application {
 
 		Text themeTitle = new Text("Color Config:");
 		themeTitle.setStyle("-fx-font-weight: bold");
-		Text dayHeader = new Text("Day Header");
-		Text background = new Text("Background");
-		Text venue = new Text("Venue");
+		Text dayHeader = new Text("Date Bar");
+		Text background = new Text("Time Bar");
+		Text venue = new Text("Venue Bar");
+		Text screenTime = new Text("Movie Block");
+		Text dayHeaderText = new Text("Date Text");
+		Text font = new Text("Movie Text");
 
 		// -- Color preview algorithm
 		// cmyk to rgb
@@ -307,6 +322,7 @@ public class Main extends Application {
 				dayHeaderColor.setFill(dColor);
 			}
 		});
+		
 		Button backgroundCheck = new Button("?");
 		backgroundCheck.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -327,6 +343,7 @@ public class Main extends Application {
 				backgroundColor.setFill(bColor);
 			}
 		});
+		
 		Button venueCheck = new Button("?");
 		venueCheck.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -347,6 +364,69 @@ public class Main extends Application {
 				venueColor.setFill(vColor);
 			}
 		});
+		
+		Button sctCheck = new Button("?");
+		sctCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = screenTimeCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				sColor = Color.rgb(r, g, b);
+				sColorConfig = new DeviceRgb(r, g, b);
+				screenTimeColor.setFill(sColor);
+			}
+		});
+		
+		Button dayHeaderTextCheck = new Button("?");
+		dayHeaderTextCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = dayHeaderTextCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				hColor = Color.rgb(r, g, b);
+				hColorConfig = new DeviceRgb(r, g, b);
+				dayHeaderTextColor.setFill(hColor);
+			}
+		});
+		
+		Button fontCheck = new Button("?");
+		fontCheck.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(final ActionEvent e) {
+				String[] code = fontCode.getText().split("\\s+");
+				double c = Double.parseDouble(code[0]);
+				double m = Double.parseDouble(code[1]);
+				double y = Double.parseDouble(code[2]);
+				double k = Double.parseDouble(code[3]);
+				double red = 255 * (1 - c) * (1 - k);
+				double green = 255 * (1 - m) * (1 - k);
+				double blue = 255 * (1 - y) * (1 - k);
+				int r = (int) red;
+				int g = (int) green;
+				int b = (int) blue;
+				fColor = Color.rgb(r, g, b);
+				fColorConfig = new DeviceRgb(r, g, b);
+				fontColor.setFill(fColor);
+			}
+		});
 
 		dColor = Color.rgb(255, 165, 0);
 		dayHeaderColor.setFill(dColor);// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html
@@ -354,20 +434,41 @@ public class Main extends Application {
 		backgroundColor.setFill(bColor);
 		vColor = Color.rgb(255, 165, 0); // https://www.rapidtables.com/convert/color/cmyk-to-rgb.html
 		venueColor.setFill(vColor);
+		sColor = Color.rgb(255, 255, 255);
+		screenTimeColor.setFill(sColor);
+		hColor = Color.rgb(255, 255, 255);
+		dayHeaderTextColor.setFill(hColor);
+		fColor = Color.rgb(0, 0, 0);
+		fontColor.setFill(fColor);
+		
+
 
 		theme.add(themeTitle, 0, 0);
 		theme.add(dayHeader, 0, 1);
 		theme.add(background, 0, 2);
 		theme.add(venue, 0, 3);
+		theme.add(screenTime, 0, 4);
+		theme.add(dayHeaderText, 0, 5);
+		theme.add(font, 0, 6);
 		theme.add(dayHeaderCode, 1, 1);
 		theme.add(backgroundCode, 1, 2);
 		theme.add(venueCode, 1, 3);
+		theme.add(screenTimeCode, 1, 4);
+		theme.add(dayHeaderTextCode, 1, 5);
+		theme.add(fontCode, 1, 6);
 		theme.add(dayHeaderCheck, 2, 1);
 		theme.add(backgroundCheck, 2, 2);
 		theme.add(venueCheck, 2, 3);
+		theme.add(sctCheck, 2, 4);
+		theme.add(dayHeaderTextCheck, 2, 5);
+		theme.add(fontCheck, 2, 6);
 		theme.add(dayHeaderColor, 3, 1);
 		theme.add(backgroundColor, 3, 2);
 		theme.add(venueColor, 3, 3);
+		theme.add(screenTimeColor, 3, 4);
+		theme.add(dayHeaderTextColor, 3, 5);
+		theme.add(fontColor, 3, 6);
+		
 
 		// ---
 		GridPane log = new GridPane();
@@ -395,12 +496,13 @@ public class Main extends Application {
 		fontTitle.setStyle("-fx-font-weight: bold");
 
 		Text fontFace = new Text("Font");
-		ObservableList<String> fonts = FXCollections.observableArrayList("Helvetica","Times Roman", "Courier");
+		ObservableList<String> fonts = FXCollections.observableArrayList("Helvetica",			
+				"NeueHaas", "Calibri", "Arial", "Garamond", "Geneva", "Verdana", "AvantGarde");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
 		fontBox.getSelectionModel().selectFirst();
 
 
-		Text fontSize = new Text("Size (Applying to venue name only for now)");
+		Text fontSize = new Text("Size");
 		ObservableList<Integer> sizes = FXCollections.observableArrayList();
 		for (int i = 2; i < 33; i++) {
 			sizes.add(i);
@@ -525,8 +627,8 @@ public class Main extends Application {
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList, colorList, sectionList);
 				masterFont = fonts.indexOf(fontBox.getValue());
-
-				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, masterFont);
+				fontLib fontLib = new fontLib();
+				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont, fontLib);
 				try {
 					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf", table, config);
 				} catch (IOException e) {
@@ -567,16 +669,12 @@ public class Main extends Application {
 		rowHeightConfigInput.setPrefWidth(150);
 		Text timeBlockTitle = new Text("Block Config:");
 		timeBlockTitle.setStyle("-fx-font-weight: bold");
-		Text minPerPxl = new Text("Mins/Pixel");
-		minPerPxlField = new TextField();
-		minPerPxlField.setPrefWidth(50);
 		checkEmpty = new RadioButton("Clear Empty Rows");
 		timeBlockConfig.add(checkEmpty, 0, 2);
 		timeBlockConfig.add(rowHeightConfig, 0, 3);
 		timeBlockConfig.add(rowHeightConfigInput, 1, 3);
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
-		timeBlockConfig.add(minPerPxl, 0, 1);
-		timeBlockConfig.add(minPerPxlField, 1, 1);
+		
 
 		// ---
 		try {
@@ -597,11 +695,11 @@ public class Main extends Application {
 			theme.setLayoutX(scene.getWidth() - 400);
 			theme.setLayoutY(10);
 			fontConfig.setLayoutX(scene.getWidth() - 400);
-			fontConfig.setLayoutY(scene.getHeight() - 350);
+			fontConfig.setLayoutY(scene.getHeight() - 250);
 			outPutGroup.setLayoutX(scene.getWidth() - 170);
 			outPutGroup.setLayoutY(scene.getHeight() - 40);
 			timeBlockConfig.setLayoutX(scene.getWidth() - 400);
-			timeBlockConfig.setLayoutY(scene.getHeight() - 230);
+			timeBlockConfig.setLayoutY(scene.getHeight() - 160);
 			primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");

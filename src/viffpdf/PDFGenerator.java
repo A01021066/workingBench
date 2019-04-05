@@ -48,6 +48,9 @@ public class PDFGenerator {
 	Color dColor;
 	Color bColor;
 	Color vColor;
+	Color sColor;
+	Color hColor;
+	Color fColor;
 	int masterFont;
 	float rowHeight;
 	PdfFont font;
@@ -108,23 +111,14 @@ public class PDFGenerator {
 		dColor = config.dColor;
 		bColor = config.bColor;
 		vColor = config.vColor;
+		sColor = config.sColor;
+		hColor = config.hColor;
+		fColor = config.fColor;
 		rowHeight = screenTimeList.get(0).thisHeight;
 		colorList = table.colorList;
 		sectionList = table.sectionList;
-		switch (config.masterFont) {
-		case 0:
-			font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-			// http://itextsupport.com/apidocs/itext7/7.1.1/com/itextpdf/io/font/constants/StandardFonts.html
-			// black magic
-			break;
-		case 1:
-			font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
-			break;
-		case 2:
-			font = PdfFontFactory.createFont(StandardFonts.COURIER);
-			break;
-
-		}
+		ArrayList<PdfFont> fonts = config.fontLib.fonts;
+		font = fonts.get(config.masterFont);
 		generate();
 	}
 
@@ -345,23 +339,23 @@ public class PDFGenerator {
 //				} else {
 //					coloredBorder.setColor(dColor);
 //				}
-				sctCell.setBorderTop(border).setBorderBottom(border).setBorderLeft(Border.NO_BORDER)
+				sctCell.setBorderTop(border).setBorderBottom(border)
 						.setBorderRight(Border.NO_BORDER);
 				if (colorList.containsKey(sct.getSectionCode())) {
 					sctCell.setNextRenderer(
 							new ColoredCellRenderer(sctCell, colorList.get(sct.getSectionCode()).getColor()));
 				} else {
-					sctCell.setBackgroundColor(dColor);
+					sctCell.setBackgroundColor(sColor);
 				}
 				Paragraph p = new Paragraph();
-				p.setPadding(0).setMargin(0);
+				p.setPadding(-1).setMargin(-1);
 
 				Text name = new Text(sct.getMovieName());
-				name.setFontSize(venueFontSize - 2).setFont(font).setFontColor(ColorConstants.BLACK)
+				name.setFontSize(venueFontSize - 2).setFont(font).setFontColor(fColor)
 						.setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
 
 				Text time = new Text("\n" + sct.getTimeDetails());
-				time.setFontSize(venueFontSize - 3f).setFont(font).setFontColor(ColorConstants.DARK_GRAY)
+				time.setFontSize(venueFontSize - 3f).setFont(font).setFontColor(fColor)
 						.setTextAlignment(TextAlignment.CENTER).setFontKerning(FontKerning.NO).setWordSpacing(0.0f);
 				p.add(name);
 				p.add(time);
@@ -475,8 +469,8 @@ public class PDFGenerator {
 		cell.setKeepTogether(true);
 		cell.setBorder(Border.NO_BORDER);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(ColorConstants.WHITE)
-				.setPadding(0).setMargin(0)); // ColorConstants
+		cell.add(new Paragraph(date).setFontSize(venueFontSize).setBold().setFontColor(hColor)
+				.setPadding(0).setMargin(0)); 
 		cell.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(dColor).setPadding(0).setPaddingLeft(10);
 		return cell;
 	}
@@ -493,7 +487,7 @@ public class PDFGenerator {
 		cell.setHeight(rowHeight);
 		cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
 		cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setPaddingLeft(0).setBold().setPadding(0).setMargin(0)
+		cell.add(new Paragraph(time)).setFontSize(venueFontSize).setBold().setPadding(0).setMargin(0)
 				.setFontColor(ColorConstants.WHITE).setBackgroundColor(bColor);
 		return cell;
 	}
@@ -545,8 +539,7 @@ public class PDFGenerator {
 					cellRect.getHeight() - 1);
 			canvas.fillStroke().restoreState();
 			// Fill the undrawn areas with black
-			canvas.saveState().setFillColor(dColor).setStrokeColor(dColor);
-			
+			canvas.saveState().setFillColor(sColor).setStrokeColor(sColor);
 			canvas.moveTo(cellRect.getX(), cellRect.getY() - 0.5);
 			canvas.lineTo(cellRect.getX() + cellRect.getWidth() - 2, cellRect.getY() - 0.5);
 			canvas.lineTo(cellRect.getX() + cellRect.getWidth() - 2, cellRect.getY() - 0.5 + cellRect.getHeight());

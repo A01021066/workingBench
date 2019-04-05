@@ -12,13 +12,22 @@ public class Configuration implements Serializable {
 	Color dColor;
 	Color bColor;
 	Color vColor;
+	Color sColor;
+	Color hColor;
+	Color fColor;
+	fontLib fontLib;
 	int masterFont;
 	
-	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor, int masterFont) {
+	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor, Color sColor, Color hColor, Color fColor, int masterFont
+			,fontLib fontLib) {
 		this.venue_font_Size = venueFontSize;
 		this.dColor = dColor;
 		this.bColor = bColor;
 		this.vColor = vColor;
+		this.sColor = sColor;
+		this.hColor = hColor;
+		this.fColor = fColor;
+		this.fontLib = fontLib;
 		this.masterFont = masterFont;
 	}
 	
