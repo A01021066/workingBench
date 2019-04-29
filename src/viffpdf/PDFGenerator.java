@@ -117,7 +117,7 @@ public class PDFGenerator {
 		rowHeight = screenTimeList.get(0).thisHeight;
 		colorList = table.colorList;
 		sectionList = table.sectionList;
-		ArrayList<PdfFont> fonts = config.fontLib.fonts;
+		ArrayList<PdfFont> fonts = Main.fontLib.fonts;
 		font = fonts.get(config.masterFont);
 		generate();
 	}

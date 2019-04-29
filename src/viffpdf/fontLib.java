@@ -1,13 +1,14 @@
 package viffpdf;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 
-public class fontLib {
+public class fontLib implements Serializable {
 	ArrayList<PdfFont> fonts = new ArrayList<PdfFont>();
 	public fontLib() {
 		try {

@@ -1,8 +1,12 @@
 package viffpdf;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -49,6 +53,8 @@ public class Main extends Application {
 	static TextField screenTimeCode = new TextField();
 	static TextField fontCode = new TextField();
 	static TextField dayHeaderTextCode = new TextField();
+	static Configuration config = null;
+	static fontLib fontLib = new fontLib();
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
@@ -522,9 +528,10 @@ public class Main extends Application {
 		// ---Output buttons
 		// ---
 		GridPane outPutGroup = new GridPane();
+		Button save = new Button("Save");
+		Button load = new Button("Load");
 		Button export = new Button("Generate");
 		export.setOnAction(new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent event) {
 				/**
@@ -627,8 +634,9 @@ public class Main extends Application {
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList, colorList, sectionList);
 				masterFont = fonts.indexOf(fontBox.getValue());
-				fontLib fontLib = new fontLib();
-				Configuration config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont, fontLib);
+				if (config == null) {
+				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont);
+				}
 				try {
 					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf", table, config);
 				} catch (IOException e) {
@@ -645,7 +653,46 @@ public class Main extends Application {
 				dateList = new ArrayList<Date>();
 			}
 		});
+		
+		save.setOnAction(new EventHandler<ActionEvent>(){
 
+			@Override
+			public void handle(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont);
+				try {
+					FileOutputStream file = new FileOutputStream("save.ser");
+					ObjectOutputStream out = new ObjectOutputStream(file);
+					out.writeObject(config);
+					out.close();
+					file.close();
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
+
+		load.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try {
+				FileInputStream file = new FileInputStream("save.ser");
+				ObjectInputStream in = new ObjectInputStream(file);
+					config = (Configuration)in.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		});
 		//// Page Setting UI
 		Button pageSetting = new Button("Page Setting");
 		pageSetting.setOnAction(new EventHandler<ActionEvent>() {
@@ -658,6 +705,8 @@ public class Main extends Application {
 		/////
 		outPutGroup.add(export, 0, 0);
 		outPutGroup.add(pageSetting, 1, 0);
+		outPutGroup.add(save, 2, 0);
+		outPutGroup.add(load, 3, 0);
 
 		// ---Time block configurations
 		// ---
@@ -696,7 +745,8 @@ public class Main extends Application {
 			theme.setLayoutY(10);
 			fontConfig.setLayoutX(scene.getWidth() - 400);
 			fontConfig.setLayoutY(scene.getHeight() - 250);
-			outPutGroup.setLayoutX(scene.getWidth() - 170);
+			outPutGroup.setHgap(10);
+			outPutGroup.setLayoutX(scene.getWidth() - 300);
 			outPutGroup.setLayoutY(scene.getHeight() - 40);
 			timeBlockConfig.setLayoutX(scene.getWidth() - 400);
 			timeBlockConfig.setLayoutY(scene.getHeight() - 160);
