@@ -7,7 +7,7 @@ import com.itextpdf.kernel.colors.Color;
 /** the "save" menu to be developed **/
 //TODO put this in a text file. In main or pdfgenerator, add a loading function that construct
 //a Configuration object that loads into Main to be used.
-public class Configuration implements Serializable {
+public class Configuration {
 	int venue_font_Size;
 	Color dColor;
 	Color bColor;

@@ -54,7 +54,7 @@ public class Main extends Application {
 	static TextField fontCode = new TextField();
 	static TextField dayHeaderTextCode = new TextField();
 	static Configuration config = null;
-	static fontLib fontLib = new fontLib();
+	static configSave saveFile = new configSave();
 	static javafx.scene.paint.Color dColor;
 	static javafx.scene.paint.Color bColor;
 	static javafx.scene.paint.Color vColor;
@@ -314,9 +314,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = dayHeaderCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('d','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('d','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('d','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('d','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -335,9 +339,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = backgroundCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('b','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('b','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('b','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('b','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -356,9 +364,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = venueCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('v','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('v','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('v','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('v','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -377,9 +389,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = screenTimeCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('s','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('s','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('s','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('s','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -398,9 +414,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = dayHeaderTextCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('h','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('h','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('h','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('h','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -419,9 +439,13 @@ public class Main extends Application {
 			public void handle(final ActionEvent e) {
 				String[] code = fontCode.getText().split("\\s+");
 				double c = Double.parseDouble(code[0]);
+				saveFile.set('f','c', c);
 				double m = Double.parseDouble(code[1]);
+				saveFile.set('f','m', m);
 				double y = Double.parseDouble(code[2]);
+				saveFile.set('f','y', y);
 				double k = Double.parseDouble(code[3]);
+				saveFile.set('f','k', k);
 				double red = 255 * (1 - c) * (1 - k);
 				double green = 255 * (1 - m) * (1 - k);
 				double blue = 255 * (1 - y) * (1 - k);
@@ -634,9 +658,7 @@ public class Main extends Application {
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList, colorList, sectionList);
 				masterFont = fonts.indexOf(fontBox.getValue());
-				if (config == null) {
 				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont);
-				}
 				try {
 					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf", table, config);
 				} catch (IOException e) {
@@ -659,11 +681,12 @@ public class Main extends Application {
 			@Override
 			public void handle(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont);
+				saveFile.setFont(fonts.indexOf(fontBox.getValue()));
+				saveFile.setFontSize(sizeBox.getValue());
 				try {
 					FileOutputStream file = new FileOutputStream("save.ser");
 					ObjectOutputStream out = new ObjectOutputStream(file);
-					out.writeObject(config);
+					out.writeObject(saveFile);
 					out.close();
 					file.close();
 					
@@ -682,7 +705,134 @@ public class Main extends Application {
 				try {
 				FileInputStream file = new FileInputStream("save.ser");
 				ObjectInputStream in = new ObjectInputStream(file);
-					config = (Configuration)in.readObject();
+					configSave temp = (configSave)in.readObject();
+					dayHeaderCode.setText(temp.getD());
+					String[] code = dayHeaderCode.getText().split("\\s+");
+					double c = Double.parseDouble(code[0]);
+					saveFile.set('d','c', c);
+					double m = Double.parseDouble(code[1]);
+					saveFile.set('d','m', m);
+					double y = Double.parseDouble(code[2]);
+					saveFile.set('d','y', y);
+					double k = Double.parseDouble(code[3]);
+					saveFile.set('d','k', k);
+					double red = 255 * (1 - c) * (1 - k);
+					double green = 255 * (1 - m) * (1 - k);
+					double blue = 255 * (1 - y) * (1 - k);
+					int r = (int) red;
+					int g = (int) green;
+					int b = (int) blue;
+					dColor = Color.rgb(r, g, b);
+					dColorConfig = new DeviceRgb(r, g, b);
+					dayHeaderColor.setFill(dColor);
+					
+					backgroundCode.setText(temp.getB());
+					code = backgroundCode.getText().split("\\s+");
+					c = Double.parseDouble(code[0]);
+					saveFile.set('b','c', c);
+					m = Double.parseDouble(code[1]);
+					saveFile.set('b','m', m);
+					y = Double.parseDouble(code[2]);
+					saveFile.set('b','y', y);
+					k = Double.parseDouble(code[3]);
+					saveFile.set('b','k', k);
+					red = 255 * (1 - c) * (1 - k);
+					green = 255 * (1 - m) * (1 - k);
+					blue = 255 * (1 - y) * (1 - k);
+					r = (int) red;
+					g = (int) green;
+					b = (int) blue;
+					bColor = Color.rgb(r, g, b);
+					bColorConfig = new DeviceRgb(r, g, b);
+					backgroundColor.setFill(bColor);
+					
+					
+					venueCode.setText(temp.getV());
+					code = venueCode.getText().split("\\s+");
+					c = Double.parseDouble(code[0]);
+					saveFile.set('v','c', c);
+					m = Double.parseDouble(code[1]);
+					saveFile.set('v','m', m);
+					y = Double.parseDouble(code[2]);
+					saveFile.set('v','y', y);
+					k = Double.parseDouble(code[3]);
+					saveFile.set('v','k', k);
+					red = 255 * (1 - c) * (1 - k);
+					green = 255 * (1 - m) * (1 - k);
+					blue = 255 * (1 - y) * (1 - k);
+					r = (int) red;
+					g = (int) green;
+					b = (int) blue;
+					vColor = Color.rgb(r, g, b);
+					vColorConfig = new DeviceRgb(r, g, b);
+					venueColor.setFill(vColor);
+					
+					
+					fontCode.setText(temp.getF());
+					code = fontCode.getText().split("\\s+");
+					c = Double.parseDouble(code[0]);
+					saveFile.set('f','c', c);
+					m = Double.parseDouble(code[1]);
+					saveFile.set('f','m', m);
+					y = Double.parseDouble(code[2]);
+					saveFile.set('f','y', y);
+					k = Double.parseDouble(code[3]);
+					saveFile.set('f','k', k);
+					red = 255 * (1 - c) * (1 - k);
+					green = 255 * (1 - m) * (1 - k);
+					blue = 255 * (1 - y) * (1 - k);
+					r = (int) red;
+					g = (int) green;
+					b = (int) blue;
+					fColor = Color.rgb(r, g, b);
+					fColorConfig = new DeviceRgb(r, g, b);
+					fontColor.setFill(fColor);
+					
+					screenTimeCode.setText(temp.getS());
+					code = screenTimeCode.getText().split("\\s+");
+					c = Double.parseDouble(code[0]);
+					saveFile.set('s','c', c);
+					m = Double.parseDouble(code[1]);
+					saveFile.set('s','m', m);
+					y = Double.parseDouble(code[2]);
+					saveFile.set('s','y', y);
+					k = Double.parseDouble(code[3]);
+					saveFile.set('s','k', k);
+					red = 255 * (1 - c) * (1 - k);
+					green = 255 * (1 - m) * (1 - k);
+					blue = 255 * (1 - y) * (1 - k);
+					r = (int) red;
+					g = (int) green;
+					b = (int) blue;
+					sColor = Color.rgb(r, g, b);
+					sColorConfig = new DeviceRgb(r, g, b);
+					screenTimeColor.setFill(sColor);
+					
+					
+					dayHeaderTextCode.setText(temp.getH());
+					code = dayHeaderTextCode.getText().split("\\s+");
+					c = Double.parseDouble(code[0]);
+					saveFile.set('h','c', c);
+					m = Double.parseDouble(code[1]);
+					saveFile.set('h','m', m);
+					y = Double.parseDouble(code[2]);
+					saveFile.set('h','y', y);
+					k = Double.parseDouble(code[3]);
+					saveFile.set('h','k', k);
+					red = 255 * (1 - c) * (1 - k);
+					green = 255 * (1 - m) * (1 - k);
+					blue = 255 * (1 - y) * (1 - k);
+					r = (int) red;
+					g = (int) green;
+					b = (int) blue;
+					hColor = Color.rgb(r, g, b);
+					hColorConfig = new DeviceRgb(r, g, b);
+					dayHeaderTextColor.setFill(hColor);
+					
+					sizeBox.getSelectionModel().select(sizes.indexOf(temp.vfs));
+					fontBox.getSelectionModel().select(temp.mf);
+					
+					
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

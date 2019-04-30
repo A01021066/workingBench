@@ -117,7 +117,8 @@ public class PDFGenerator {
 		rowHeight = screenTimeList.get(0).thisHeight;
 		colorList = table.colorList;
 		sectionList = table.sectionList;
-		ArrayList<PdfFont> fonts = Main.fontLib.fonts;
+		fontLib fontLib = new fontLib();
+		ArrayList<PdfFont> fonts = fontLib.fonts;
 		font = fonts.get(config.masterFont);
 		generate();
 	}
@@ -139,7 +140,8 @@ public class PDFGenerator {
 		document.setFontProvider(document.getFontProvider());
 		document.setMargins(0, 5, 0, 5);
 		SimpleDateFormat fmt = new SimpleDateFormat("EEEEEEE, MMMMMMMM dd", Locale.US);
-
+		PageTable.pageCount = 1;
+		PageTable.dayCount = 0;
 		// draw each page we have in the data.
 		for (PageTable pt : pageList) {
 			float heightCounter = 0;
