@@ -1,7 +1,5 @@
 package viffpdf;
 
-import javafx.scene.text.Font;
-import java.io.Serializable;
 
 import com.itextpdf.kernel.colors.Color;
 /** the "save" menu to be developed **/
@@ -15,9 +13,11 @@ public class Configuration {
 	Color sColor;
 	Color hColor;
 	Color fColor;
+	Color oColor;
+	Color eColor;
 	int masterFont;
 	
-	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor, Color sColor, Color hColor, Color fColor, int masterFont) {
+	public Configuration(int venueFontSize, Color dColor, Color bColor, Color vColor, Color sColor, Color hColor, Color fColor, Color oColor, Color eColor, int masterFont) {
 		this.venue_font_Size = venueFontSize;
 		this.dColor = dColor;
 		this.bColor = bColor;
@@ -25,6 +25,8 @@ public class Configuration {
 		this.sColor = sColor;
 		this.hColor = hColor;
 		this.fColor = fColor;
+		this.oColor = oColor;
+		this.eColor = eColor;
 		this.masterFont = masterFont;
 	}
 	

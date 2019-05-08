@@ -19,6 +19,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.Group;
@@ -37,36 +38,31 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.scene.control.ColorPicker;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.color.*;
+
 public class Main extends Application {
-	static Rectangle dayHeaderColor = new Rectangle(20, 20);
-	static Rectangle backgroundColor = new Rectangle(20, 20);
-	static Rectangle venueColor = new Rectangle(20, 20);
-	static Rectangle screenTimeColor = new Rectangle(20, 20);
-	static Rectangle dayHeaderTextColor = new Rectangle(20, 20);
-	static Rectangle fontColor = new Rectangle(20, 20);
-	static TextField dayHeaderCode = new TextField();
-	static TextField backgroundCode = new TextField();
-	static TextField venueCode = new TextField();
-	static TextField screenTimeCode = new TextField();
-	static TextField fontCode = new TextField();
-	static TextField dayHeaderTextCode = new TextField();
 	static Configuration config = null;
 	static configSave saveFile = new configSave();
-	static javafx.scene.paint.Color dColor;
-	static javafx.scene.paint.Color bColor;
-	static javafx.scene.paint.Color vColor;
-	static javafx.scene.paint.Color sColor;
-	static javafx.scene.paint.Color hColor;
-	static javafx.scene.paint.Color fColor;
+	static javafx.scene.paint.Color dColor = Color.rgb(255, 165, 0);
+	static javafx.scene.paint.Color bColor = Color.rgb(0, 0, 0);
+	static javafx.scene.paint.Color vColor = Color.rgb(255, 165, 0);
+	static javafx.scene.paint.Color sColor = Color.rgb(255, 255, 255);
+	static javafx.scene.paint.Color hColor = Color.rgb(255, 255, 255);
+	static javafx.scene.paint.Color fColor = Color.rgb(0, 0, 0);
+	static javafx.scene.paint.Color oColor = Color.GRAY;
+	static javafx.scene.paint.Color eColor = Color.DARKGRAY;
 	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color sColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
 	static com.itextpdf.kernel.colors.Color fColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color hColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
+	static com.itextpdf.kernel.colors.Color oColorConfig = com.itextpdf.kernel.colors.ColorConstants.GRAY;
+	static com.itextpdf.kernel.colors.Color eColorConfig = com.itextpdf.kernel.colors.ColorConstants.DARK_GRAY;
 
 	static TextField rowHeightConfigInput = new TextField("13.1");
 	static Text colorStat;
@@ -96,7 +92,6 @@ public class Main extends Application {
 	private static final int COLORS = 1;
 	private static final int VENUES = 2;
 	private static final int SCREEN_TIMES = 3;
-	
 
 	/**
 	 * Opens a file and passes it to the corresponding parser.
@@ -158,7 +153,7 @@ public class Main extends Application {
 		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
 		for (int n = 2; n < 10; n++) {
 			NumField textField = new NumField();
-			String defTxt = (n<10)? "4": "0";
+			String defTxt = (n < 10) ? "4" : "0";
 			textField.setText(defTxt);
 			textField.setId(varNames[n - 2]);
 			pageSettingLayOut.add(textField, 6, n);
@@ -214,12 +209,23 @@ public class Main extends Application {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void start(Stage primaryStage) {
 
 		parsers.add(SECTIONS, new SectionParser());
 		parsers.add(COLORS, new ColorParser());
 		parsers.add(VENUES, new VenueParser());
 		parsers.add(SCREEN_TIMES, new ScreenTimeParser());
+		rowHeightConfigInput.setMaxWidth(50);
+		saveFile.set('d', rgbToCmyk(dColor));
+		saveFile.set('b', rgbToCmyk(bColor));
+		saveFile.set('v', rgbToCmyk(vColor));
+		saveFile.set('s', rgbToCmyk(sColor));
+		saveFile.set('h', rgbToCmyk(hColor));
+		saveFile.set('f', rgbToCmyk(fColor));
+		saveFile.set('o', rgbToCmyk(oColor));
+		saveFile.set('e', rgbToCmyk(eColor));
+
 		// ---Loaders
 		//
 		GridPane loaderGroup = new GridPane();
@@ -305,200 +311,604 @@ public class Main extends Application {
 		Text screenTime = new Text("Movie Block");
 		Text dayHeaderText = new Text("Date Text");
 		Text font = new Text("Movie Text");
+		Text oddRow = new Text("Odd Row");
+		Text evenRow = new Text("Even Row");
 
-		// -- Color preview algorithm
-		// cmyk to rgb
-		Button dayHeaderCheck = new Button("?");
-		dayHeaderCheck.setOnAction(new EventHandler<ActionEvent>() {
+		ColorPicker dayPicker = new ColorPicker();
+		dayPicker.setMaxWidth(40);
+		dayPicker.setValue(dColor);
+        dayPicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = dayHeaderCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('d','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('d','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('d','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('d','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				dColor = Color.rgb(r, g, b);
-				dColorConfig = new DeviceRgb(r, g, b);
-				dayHeaderColor.setFill(dColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(dayPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('d', list);
+				dColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
 			}
-		});
-		
-		Button backgroundCheck = new Button("?");
-		backgroundCheck.setOnAction(new EventHandler<ActionEvent>() {
+        });
+        
+		ColorPicker backPicker = new ColorPicker();
+		backPicker.setMaxWidth(40);
+		backPicker.setValue(bColor);
+        backPicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = backgroundCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('b','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('b','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('b','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('b','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				bColor = Color.rgb(r, g, b);
-				bColorConfig = new DeviceRgb(r, g, b);
-				backgroundColor.setFill(bColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(backPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('b', list);
+				bColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
 			}
-		});
+        });
 		
-		Button venueCheck = new Button("?");
-		venueCheck.setOnAction(new EventHandler<ActionEvent>() {
+		ColorPicker venuePicker = new ColorPicker();
+		venuePicker.setMaxWidth(40);
+		venuePicker.setValue(vColor);
+        venuePicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = venueCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('v','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('v','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('v','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('v','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				vColor = Color.rgb(r, g, b);
-				vColorConfig = new DeviceRgb(r, g, b);
-				venueColor.setFill(vColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(venuePicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('v', list);
+				vColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
 			}
-		});
+        });
 		
-		Button sctCheck = new Button("?");
-		sctCheck.setOnAction(new EventHandler<ActionEvent>() {
+		ColorPicker screenPicker = new ColorPicker();
+		screenPicker.setMaxWidth(40);
+		screenPicker.setValue(sColor);
+        screenPicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = screenTimeCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('s','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('s','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('s','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('s','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				sColor = Color.rgb(r, g, b);
-				sColorConfig = new DeviceRgb(r, g, b);
-				screenTimeColor.setFill(sColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(screenPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('s', list);
+				sColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
 			}
-		});
+        });
 		
-		Button dayHeaderTextCheck = new Button("?");
-		dayHeaderTextCheck.setOnAction(new EventHandler<ActionEvent>() {
+		ColorPicker dayTextPicker = new ColorPicker();
+		dayTextPicker.setMaxWidth(40);
+		dayTextPicker.setValue(hColor);
+        dayTextPicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = dayHeaderTextCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('h','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('h','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('h','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('h','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				hColor = Color.rgb(r, g, b);
-				hColorConfig = new DeviceRgb(r, g, b);
-				dayHeaderTextColor.setFill(hColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(dayTextPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('h', list);
+				hColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
 			}
-		});
+        });
 		
-		Button fontCheck = new Button("?");
-		fontCheck.setOnAction(new EventHandler<ActionEvent>() {
+		ColorPicker fontPicker = new ColorPicker();
+		fontPicker.setMaxWidth(40);
+		fontPicker.setValue(fColor);
+        fontPicker.setOnAction(new EventHandler() {
 			@Override
-			public void handle(final ActionEvent e) {
-				String[] code = fontCode.getText().split("\\s+");
-				double c = Double.parseDouble(code[0]);
-				saveFile.set('f','c', c);
-				double m = Double.parseDouble(code[1]);
-				saveFile.set('f','m', m);
-				double y = Double.parseDouble(code[2]);
-				saveFile.set('f','y', y);
-				double k = Double.parseDouble(code[3]);
-				saveFile.set('f','k', k);
-				double red = 255 * (1 - c) * (1 - k);
-				double green = 255 * (1 - m) * (1 - k);
-				double blue = 255 * (1 - y) * (1 - k);
-				int r = (int) red;
-				int g = (int) green;
-				int b = (int) blue;
-				fColor = Color.rgb(r, g, b);
-				fColorConfig = new DeviceRgb(r, g, b);
-				fontColor.setFill(fColor);
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(fontPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('f', list);
+				fColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+			}
+        });
+		
+		ColorPicker oddPicker = new ColorPicker();
+		oddPicker.setMaxWidth(40);
+		oddPicker.setValue(oColor);
+        oddPicker.setOnAction(new EventHandler() {
+			@Override
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(oddPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('o', list);
+				oColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+			}
+        });
+		
+		ColorPicker evenPicker = new ColorPicker();
+		evenPicker.setMaxWidth(40);
+		evenPicker.setValue(eColor);
+        evenPicker.setOnAction(new EventHandler() {
+			@Override
+			public void handle(Event arg0) {
+				ArrayList<Double> list = rgbToCmyk(evenPicker.getValue());
+				float c1 = list.get(0).floatValue();
+				float m1 = list.get(1).floatValue();
+				float y1 = list.get(2).floatValue();
+				float k1 = list.get(3).floatValue();
+				saveFile.set('e', list);
+				eColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+			}
+        });
+
+		ArrayList<TextField> colorInputs = new ArrayList<TextField>();
+
+		TextField dc = new TextField();
+		dc.setMaxWidth(50);
+		colorInputs.add(dc);
+
+		TextField dm = new TextField();
+		dm.setMaxWidth(50);
+		colorInputs.add(dm);
+
+		TextField dy = new TextField();
+		dy.setMaxWidth(50);
+		colorInputs.add(dy);
+
+		TextField dk = new TextField();
+		dk.setMaxWidth(50);
+		colorInputs.add(dk);
+
+		TextField bc = new TextField();
+		bc.setMaxWidth(50);
+		colorInputs.add(bc);
+
+		TextField bm = new TextField();
+		bm.setMaxWidth(50);
+		colorInputs.add(bm);
+
+		TextField by = new TextField();
+		by.setMaxWidth(50);
+		colorInputs.add(by);
+
+		TextField bk = new TextField();
+		bk.setMaxWidth(50);
+		colorInputs.add(bk);
+
+		TextField vc = new TextField();
+		vc.setMaxWidth(50);
+		colorInputs.add(vc);
+
+		TextField vm = new TextField();
+		vm.setMaxWidth(50);
+		colorInputs.add(vm);
+
+		TextField vy = new TextField();
+		vy.setMaxWidth(50);
+		colorInputs.add(vy);
+
+		TextField vk = new TextField();
+		vk.setMaxWidth(50);
+		colorInputs.add(vk);
+
+		TextField sc = new TextField();
+		sc.setMaxWidth(50);
+		colorInputs.add(sc);
+
+		TextField sm = new TextField();
+		sm.setMaxWidth(50);
+		colorInputs.add(sm);
+
+		TextField sy = new TextField();
+		sy.setMaxWidth(50);
+		colorInputs.add(sy);
+
+		TextField sk = new TextField();
+		sk.setMaxWidth(50);
+		colorInputs.add(sk);
+
+		TextField fc = new TextField();
+		fc.setMaxWidth(50);
+		colorInputs.add(fc);
+
+		TextField fm = new TextField();
+		fm.setMaxWidth(50);
+		colorInputs.add(fm);
+
+		TextField fy = new TextField();
+		fy.setMaxWidth(50);
+		colorInputs.add(fy);
+
+		TextField fk = new TextField();
+		fk.setMaxWidth(50);
+		colorInputs.add(fk);
+
+		TextField oc = new TextField();
+		oc.setMaxWidth(50);
+		colorInputs.add(oc);
+
+		TextField om = new TextField();
+		om.setMaxWidth(50);
+		colorInputs.add(om);
+
+		TextField oy = new TextField();
+		oy.setMaxWidth(50);
+		colorInputs.add(oy);
+
+		TextField ok = new TextField();
+		ok.setMaxWidth(50);
+		colorInputs.add(ok);
+
+		TextField ec = new TextField();
+		ec.setMaxWidth(50);
+		colorInputs.add(ec);
+
+		TextField em = new TextField();
+		em.setMaxWidth(50);
+		colorInputs.add(em);
+
+		TextField ey = new TextField();
+		ey.setMaxWidth(50);
+		colorInputs.add(ey);
+
+		TextField ek = new TextField();
+		ek.setMaxWidth(50);
+		colorInputs.add(ek);
+
+		TextField hc = new TextField();
+		hc.setMaxWidth(50);
+		colorInputs.add(hc);
+
+		TextField hm = new TextField();
+		hm.setMaxWidth(50);
+		colorInputs.add(hm);
+
+		TextField hy = new TextField();
+		hy.setMaxWidth(50);
+		colorInputs.add(hy);
+
+		TextField hk = new TextField();
+		hk.setMaxWidth(50);
+		colorInputs.add(hk);
+
+		/*
+		 * Special Thanks to: Johnny Fam
+		 */
+		Button dB = new Button("↵");
+		/*
+		 * Special Thanks ends here
+		 * 
+		 */
+
+		dB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(dc.getText());
+					double m = Double.parseDouble(dm.getText());
+					double y = Double.parseDouble(dy.getText());
+					double k = Double.parseDouble(dk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(dc.getText()));
+					l.add(Double.parseDouble(dm.getText()));
+					l.add(Double.parseDouble(dy.getText()));
+					l.add(Double.parseDouble(dk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					dColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('d', l);
+				}
+				dayPicker.setValue(test);
 			}
 		});
 
-		dColor = Color.rgb(255, 165, 0);
-		dayHeaderColor.setFill(dColor);// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html
-		bColor = Color.rgb(0, 0, 0); // https://www.rapidtables.com/convert/color/rgb-to-cmyk.html
-		backgroundColor.setFill(bColor);
-		vColor = Color.rgb(255, 165, 0); // https://www.rapidtables.com/convert/color/cmyk-to-rgb.html
-		venueColor.setFill(vColor);
-		sColor = Color.rgb(255, 255, 255);
-		screenTimeColor.setFill(sColor);
-		hColor = Color.rgb(255, 255, 255);
-		dayHeaderTextColor.setFill(hColor);
-		fColor = Color.rgb(0, 0, 0);
-		fontColor.setFill(fColor);
-		
+		Button bB = new Button("↵");
+		bB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(bc.getText());
+					double m = Double.parseDouble(bm.getText());
+					double y = Double.parseDouble(by.getText());
+					double k = Double.parseDouble(bk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(bc.getText()));
+					l.add(Double.parseDouble(bm.getText()));
+					l.add(Double.parseDouble(by.getText()));
+					l.add(Double.parseDouble(bk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					bColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('b', l);
+				}
+				backPicker.setValue(test);
+			}
+		});
 
+		Button vB = new Button("↵");
+		vB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(vc.getText());
+					double m = Double.parseDouble(vm.getText());
+					double y = Double.parseDouble(vy.getText());
+					double k = Double.parseDouble(vk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(vc.getText()));
+					l.add(Double.parseDouble(vm.getText()));
+					l.add(Double.parseDouble(vy.getText()));
+					l.add(Double.parseDouble(vk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					vColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('v', l);
+				}
+				venuePicker.setValue(test);
+			}
+		});
+
+		Button sB = new Button("↵");
+		sB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(sc.getText());
+					double m = Double.parseDouble(sm.getText());
+					double y = Double.parseDouble(sy.getText());
+					double k = Double.parseDouble(sk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(sc.getText()));
+					l.add(Double.parseDouble(sm.getText()));
+					l.add(Double.parseDouble(sy.getText()));
+					l.add(Double.parseDouble(sk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					sColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('s', l);
+				}
+				screenPicker.setValue(test);
+			}
+		});
+
+		Button hB = new Button("↵");
+		hB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(hc.getText());
+					double m = Double.parseDouble(hm.getText());
+					double y = Double.parseDouble(hy.getText());
+					double k = Double.parseDouble(hk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(hc.getText()));
+					l.add(Double.parseDouble(hm.getText()));
+					l.add(Double.parseDouble(hy.getText()));
+					l.add(Double.parseDouble(hk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					hColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('h', l);
+				}
+				dayTextPicker.setValue(test);
+			}
+		});
+
+		Button fB = new Button("↵");
+		fB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+					double c = Double.parseDouble(fc.getText());
+					double m = Double.parseDouble(fm.getText());
+					double y = Double.parseDouble(fy.getText());
+					double k = Double.parseDouble(fk.getText());
+					test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(fc.getText()));
+					l.add(Double.parseDouble(fm.getText()));
+					l.add(Double.parseDouble(fy.getText()));
+					l.add(Double.parseDouble(fk.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					fColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('f', l);
+				}
+				fontPicker.setValue(test);
+			}
+		});
+
+		Button oB = new Button("↵");
+		oB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+				double c = Double.parseDouble(oc.getText());
+				double m = Double.parseDouble(om.getText());
+				double y = Double.parseDouble(oy.getText());
+				double k = Double.parseDouble(ok.getText());
+				test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(oc.getText()));
+					l.add(Double.parseDouble(om.getText()));
+					l.add(Double.parseDouble(oy.getText()));
+					l.add(Double.parseDouble(ok.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					oColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('o', l);
+				}
+				oddPicker.setValue(test);
+			}
+		});
+
+		Button eB = new Button("↵");
+		eB.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Color test = null;
+				try {
+				double c = Double.parseDouble(ec.getText());
+				double m = Double.parseDouble(em.getText());
+				double y = Double.parseDouble(ey.getText());
+				double k = Double.parseDouble(ek.getText());
+				test = cmykToRgb(c, m, y, k);
+				} catch (Exception e) {
+					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
+							+ "any space empty.");
+					return;
+				}
+				if (test != null) {
+					ArrayList<Double> l = new ArrayList<Double>();
+					l.add(Double.parseDouble(ec.getText()));
+					l.add(Double.parseDouble(em.getText()));
+					l.add(Double.parseDouble(ey.getText()));
+					l.add(Double.parseDouble(ek.getText()));
+					float c1 = l.get(0).floatValue();
+					float m1 = l.get(1).floatValue();
+					float y1 = l.get(2).floatValue();
+					float k1 = l.get(3).floatValue();
+					eColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('e', l);
+				}
+				evenPicker.setValue(test);
+			}
+		});
 
 		theme.add(themeTitle, 0, 0);
+
 		theme.add(dayHeader, 0, 1);
+		theme.add(dayPicker, 1, 1);
+		theme.add(dc, 2, 1);
+		theme.add(dm, 3, 1);
+		theme.add(dy, 4, 1);
+		theme.add(dk, 5, 1);
+		theme.add(dB, 6, 1);
+
 		theme.add(background, 0, 2);
+		theme.add(backPicker, 1, 2);
+		theme.add(bc, 2, 2);
+		theme.add(bm, 3, 2);
+		theme.add(by, 4, 2);
+		theme.add(bk, 5, 2);
+		theme.add(bB, 6, 2);
+
 		theme.add(venue, 0, 3);
+		theme.add(venuePicker, 1, 3);
+		theme.add(vc, 2, 3);
+		theme.add(vm, 3, 3);
+		theme.add(vy, 4, 3);
+		theme.add(vk, 5, 3);
+		theme.add(vB, 6, 3);
+
 		theme.add(screenTime, 0, 4);
+		theme.add(screenPicker, 1, 4);
+		theme.add(sc, 2, 4);
+		theme.add(sm, 3, 4);
+		theme.add(sy, 4, 4);
+		theme.add(sk, 5, 4);
+		theme.add(sB, 6, 4);
+
 		theme.add(dayHeaderText, 0, 5);
+		theme.add(dayTextPicker, 1, 5);
+		theme.add(hc, 2, 5);
+		theme.add(hm, 3, 5);
+		theme.add(hy, 4, 5);
+		theme.add(hk, 5, 5);
+		theme.add(hB, 6, 5);
+
 		theme.add(font, 0, 6);
-		theme.add(dayHeaderCode, 1, 1);
-		theme.add(backgroundCode, 1, 2);
-		theme.add(venueCode, 1, 3);
-		theme.add(screenTimeCode, 1, 4);
-		theme.add(dayHeaderTextCode, 1, 5);
-		theme.add(fontCode, 1, 6);
-		theme.add(dayHeaderCheck, 2, 1);
-		theme.add(backgroundCheck, 2, 2);
-		theme.add(venueCheck, 2, 3);
-		theme.add(sctCheck, 2, 4);
-		theme.add(dayHeaderTextCheck, 2, 5);
-		theme.add(fontCheck, 2, 6);
-		theme.add(dayHeaderColor, 3, 1);
-		theme.add(backgroundColor, 3, 2);
-		theme.add(venueColor, 3, 3);
-		theme.add(screenTimeColor, 3, 4);
-		theme.add(dayHeaderTextColor, 3, 5);
-		theme.add(fontColor, 3, 6);
-		
+		theme.add(fontPicker, 1, 6);
+		theme.add(fc, 2, 6);
+		theme.add(fm, 3, 6);
+		theme.add(fy, 4, 6);
+		theme.add(fk, 5, 6);
+		theme.add(fB, 6, 6);
+
+		theme.add(oddRow, 0, 7);
+		theme.add(oddPicker, 1, 7);
+		theme.add(oc, 2, 7);
+		theme.add(om, 3, 7);
+		theme.add(oy, 4, 7);
+		theme.add(ok, 5, 7);
+		theme.add(oB, 6, 7);
+
+		theme.add(evenRow, 0, 8);
+		theme.add(evenPicker, 1, 8);
+		theme.add(ec, 2, 8);
+		theme.add(em, 3, 8);
+		theme.add(ey, 4, 8);
+		theme.add(ek, 5, 8);
+		theme.add(eB, 6, 8);
 
 		// ---
 		GridPane log = new GridPane();
@@ -522,15 +932,14 @@ public class Main extends Application {
 		fontConfig.setHgap(10);
 		fontConfig.setVgap(10);
 
-		Text fontTitle = new Text("Font Config:");
+		Text fontTitle = new Text("Font:");
 		fontTitle.setStyle("-fx-font-weight: bold");
 
 		Text fontFace = new Text("Font");
-		ObservableList<String> fonts = FXCollections.observableArrayList("Helvetica",			
-				"NeueHaas", "Calibri", "Arial", "Garamond", "Geneva", "Verdana", "AvantGarde");
+		ObservableList<String> fonts = FXCollections.observableArrayList("Helvetica", "NeueHaas", "Calibri", "Arial",
+				"Garamond", "Geneva", "Verdana", "AvantGarde");
 		final ComboBox<String> fontBox = new ComboBox<String>(fonts);
 		fontBox.getSelectionModel().selectFirst();
-
 
 		Text fontSize = new Text("Size");
 		ObservableList<Integer> sizes = FXCollections.observableArrayList();
@@ -567,7 +976,7 @@ public class Main extends Application {
 				HashMap<String, VenueData> venueList = ((VenueParser) parsers.get(2)).getVenueList();
 				colorList = ((ColorParser) parsers.get(1)).getColorMap();
 				Iterator<Map.Entry<String, ColorData>> itt = colorList.entrySet().iterator();
-					while (itt.hasNext()) {
+				while (itt.hasNext()) {
 					Map.Entry<String, ColorData> e = (Map.Entry<String, ColorData>) itt.next();
 					System.out.println(e.getValue().getColor());
 				}
@@ -604,8 +1013,9 @@ public class Main extends Application {
 						// a specific venue(unique to object)
 						// a specific date(unique to object)
 						// an arraylist of sct data(all of the movies shown on this venue at this date)
-						
-						VenueDateTable vdtEntry = new VenueDateTable(vt, d, Float.parseFloat(rowHeightConfigInput.getText()));
+
+						VenueDateTable vdtEntry = new VenueDateTable(vt, d,
+								Float.parseFloat(rowHeightConfigInput.getText()));
 						if (checkEmpty.isSelected()) {
 							if (!vdtEntry.thisVDT.isEmpty()) {
 								VDTList.add(vdtEntry);
@@ -639,28 +1049,15 @@ public class Main extends Application {
 				if (dayCounter <= dateList.size()) {
 					int leftOver = dateList.size() - dayCounter;
 					Status.print("After formatting, you have " + leftOver + " days left unallocated.");
-//					int leftOverHeight = 0;
-//					for (int l = DList.size() - leftOver; l < DList.size(); l++) {
-//						leftOverHeight += DList.get(l).thisHeight;
-//						Status.print(DList.get(l).dayDate + "");
-//						Status.print(leftOverHeight + "");
-//					}
-//					try {
-//						int leftOverPage = (int) Math.ceil(leftOverHeight / PList.get(0).maxHeight);
-//						Status.print("It will take approximately " + leftOverPage
-//								+ " more pages to fill in all of the days.");
-//					} catch (IndexOutOfBoundsException empty) {
-//						Status.print("Please update your page setting.");
-//					}
-//					super spaghetti, not priority, fix later				
-
 				}
 
 				AllTable table = new AllTable(VTList, VDTList, DList, PList, dateList, colorList, sectionList);
 				masterFont = fonts.indexOf(fontBox.getValue());
-				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig, hColorConfig, fColorConfig, masterFont);
+				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig,
+						hColorConfig, fColorConfig, oColorConfig, eColorConfig, masterFont);
 				try {
-					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf", table, config);
+					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf",
+							table, config);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -675,8 +1072,8 @@ public class Main extends Application {
 				dateList = new ArrayList<Date>();
 			}
 		});
-		
-		save.setOnAction(new EventHandler<ActionEvent>(){
+
+		save.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent arg0) {
@@ -689,12 +1086,12 @@ public class Main extends Application {
 					out.writeObject(saveFile);
 					out.close();
 					file.close();
-					
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		});
 
 		load.setOnAction(new EventHandler<ActionEvent>() {
@@ -703,145 +1100,99 @@ public class Main extends Application {
 			public void handle(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				try {
-				FileInputStream file = new FileInputStream("save.ser");
-				ObjectInputStream in = new ObjectInputStream(file);
-					configSave temp = (configSave)in.readObject();
-					dayHeaderCode.setText(temp.getD());
-					String[] code = dayHeaderCode.getText().split("\\s+");
-					double c = Double.parseDouble(code[0]);
-					saveFile.set('d','c', c);
-					double m = Double.parseDouble(code[1]);
-					saveFile.set('d','m', m);
-					double y = Double.parseDouble(code[2]);
-					saveFile.set('d','y', y);
-					double k = Double.parseDouble(code[3]);
-					saveFile.set('d','k', k);
-					double red = 255 * (1 - c) * (1 - k);
-					double green = 255 * (1 - m) * (1 - k);
-					double blue = 255 * (1 - y) * (1 - k);
-					int r = (int) red;
-					int g = (int) green;
-					int b = (int) blue;
-					dColor = Color.rgb(r, g, b);
-					dColorConfig = new DeviceRgb(r, g, b);
-					dayHeaderColor.setFill(dColor);
-					
-					backgroundCode.setText(temp.getB());
-					code = backgroundCode.getText().split("\\s+");
-					c = Double.parseDouble(code[0]);
-					saveFile.set('b','c', c);
-					m = Double.parseDouble(code[1]);
-					saveFile.set('b','m', m);
-					y = Double.parseDouble(code[2]);
-					saveFile.set('b','y', y);
-					k = Double.parseDouble(code[3]);
-					saveFile.set('b','k', k);
-					red = 255 * (1 - c) * (1 - k);
-					green = 255 * (1 - m) * (1 - k);
-					blue = 255 * (1 - y) * (1 - k);
-					r = (int) red;
-					g = (int) green;
-					b = (int) blue;
-					bColor = Color.rgb(r, g, b);
-					bColorConfig = new DeviceRgb(r, g, b);
-					backgroundColor.setFill(bColor);
-					
-					
-					venueCode.setText(temp.getV());
-					code = venueCode.getText().split("\\s+");
-					c = Double.parseDouble(code[0]);
-					saveFile.set('v','c', c);
-					m = Double.parseDouble(code[1]);
-					saveFile.set('v','m', m);
-					y = Double.parseDouble(code[2]);
-					saveFile.set('v','y', y);
-					k = Double.parseDouble(code[3]);
-					saveFile.set('v','k', k);
-					red = 255 * (1 - c) * (1 - k);
-					green = 255 * (1 - m) * (1 - k);
-					blue = 255 * (1 - y) * (1 - k);
-					r = (int) red;
-					g = (int) green;
-					b = (int) blue;
-					vColor = Color.rgb(r, g, b);
-					vColorConfig = new DeviceRgb(r, g, b);
-					venueColor.setFill(vColor);
-					
-					
-					fontCode.setText(temp.getF());
-					code = fontCode.getText().split("\\s+");
-					c = Double.parseDouble(code[0]);
-					saveFile.set('f','c', c);
-					m = Double.parseDouble(code[1]);
-					saveFile.set('f','m', m);
-					y = Double.parseDouble(code[2]);
-					saveFile.set('f','y', y);
-					k = Double.parseDouble(code[3]);
-					saveFile.set('f','k', k);
-					red = 255 * (1 - c) * (1 - k);
-					green = 255 * (1 - m) * (1 - k);
-					blue = 255 * (1 - y) * (1 - k);
-					r = (int) red;
-					g = (int) green;
-					b = (int) blue;
-					fColor = Color.rgb(r, g, b);
-					fColorConfig = new DeviceRgb(r, g, b);
-					fontColor.setFill(fColor);
-					
-					screenTimeCode.setText(temp.getS());
-					code = screenTimeCode.getText().split("\\s+");
-					c = Double.parseDouble(code[0]);
-					saveFile.set('s','c', c);
-					m = Double.parseDouble(code[1]);
-					saveFile.set('s','m', m);
-					y = Double.parseDouble(code[2]);
-					saveFile.set('s','y', y);
-					k = Double.parseDouble(code[3]);
-					saveFile.set('s','k', k);
-					red = 255 * (1 - c) * (1 - k);
-					green = 255 * (1 - m) * (1 - k);
-					blue = 255 * (1 - y) * (1 - k);
-					r = (int) red;
-					g = (int) green;
-					b = (int) blue;
-					sColor = Color.rgb(r, g, b);
-					sColorConfig = new DeviceRgb(r, g, b);
-					screenTimeColor.setFill(sColor);
-					
-					
-					dayHeaderTextCode.setText(temp.getH());
-					code = dayHeaderTextCode.getText().split("\\s+");
-					c = Double.parseDouble(code[0]);
-					saveFile.set('h','c', c);
-					m = Double.parseDouble(code[1]);
-					saveFile.set('h','m', m);
-					y = Double.parseDouble(code[2]);
-					saveFile.set('h','y', y);
-					k = Double.parseDouble(code[3]);
-					saveFile.set('h','k', k);
-					red = 255 * (1 - c) * (1 - k);
-					green = 255 * (1 - m) * (1 - k);
-					blue = 255 * (1 - y) * (1 - k);
-					r = (int) red;
-					g = (int) green;
-					b = (int) blue;
-					hColor = Color.rgb(r, g, b);
-					hColorConfig = new DeviceRgb(r, g, b);
-					dayHeaderTextColor.setFill(hColor);
-					
+					FileInputStream file = new FileInputStream("save.ser");
+					ObjectInputStream in = new ObjectInputStream(file);
+					configSave temp = (configSave) in.readObject();
+
 					sizeBox.getSelectionModel().select(sizes.indexOf(temp.vfs));
 					fontBox.getSelectionModel().select(temp.mf);
+					float c1;
+					float m1;
+					float y1;
+					float k1;
 					
+					ArrayList<Double> d = temp.getD();
+					dayPicker.setValue(cmykToRgb(d));
+					c1 = d.get(0).floatValue();
+					m1 = d.get(1).floatValue();
+					y1 = d.get(2).floatValue();
+					k1 = d.get(3).floatValue();
+					dColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('d', d);
+
 					
+					ArrayList<Double> b = temp.getB();
+					backPicker.setValue(cmykToRgb(b));
+					c1 = b.get(0).floatValue();
+					m1 = b.get(1).floatValue();
+					y1 = b.get(2).floatValue();
+					k1 = b.get(3).floatValue();
+					bColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('b', b);
+					
+					ArrayList<Double> v = temp.getV();
+					venuePicker.setValue(cmykToRgb(v));
+					c1 = v.get(0).floatValue();
+					m1 = v.get(1).floatValue();
+					y1 = v.get(2).floatValue();
+					k1 = v.get(3).floatValue();
+					vColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('v', v);
+					
+					ArrayList<Double> s = temp.getS();
+					screenPicker.setValue(cmykToRgb(s));
+					c1 = s.get(0).floatValue();
+					m1 = s.get(1).floatValue();
+					y1 = s.get(2).floatValue();
+					k1 = s.get(3).floatValue();
+					sColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('s', s);
+					
+					ArrayList<Double> h = temp.getH();
+					dayTextPicker.setValue(cmykToRgb(h));
+					c1 = h.get(0).floatValue();
+					m1 = h.get(1).floatValue();
+					y1 = h.get(2).floatValue();
+					k1 = h.get(3).floatValue();
+					hColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('h', h);
+					
+					ArrayList<Double> f = temp.getF();
+					fontPicker.setValue(cmykToRgb(f));
+					c1 = f.get(0).floatValue();
+					m1 = f.get(1).floatValue();
+					y1 = f.get(2).floatValue();
+					k1 = f.get(3).floatValue();
+					fColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('f', f);
+					
+					ArrayList<Double> o = temp.getO();
+					oddPicker.setValue(cmykToRgb(o));
+					c1 = o.get(0).floatValue();
+					m1 = o.get(1).floatValue();
+					y1 = o.get(2).floatValue();
+					k1 = o.get(3).floatValue();
+					oColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('o', o);
+					
+					ArrayList<Double> e = temp.getE();
+					evenPicker.setValue(cmykToRgb(e));
+					c1 = e.get(0).floatValue();
+					m1 = e.get(1).floatValue();
+					y1 = e.get(2).floatValue();
+					k1 = e.get(3).floatValue();
+					eColorConfig = new com.itextpdf.kernel.colors.DeviceCmyk(c1, m1, y1, k1);
+					saveFile.set('e', e);
+
+
+
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			
+
 		});
 		//// Page Setting UI
 		Button pageSetting = new Button("Page Setting");
@@ -866,14 +1217,13 @@ public class Main extends Application {
 		Text rowHeightConfig = new Text("Max Row Height: ");
 
 		rowHeightConfigInput.setPrefWidth(150);
-		Text timeBlockTitle = new Text("Block Config:");
+		Text timeBlockTitle = new Text("Line:");
 		timeBlockTitle.setStyle("-fx-font-weight: bold");
 		checkEmpty = new RadioButton("Clear Empty Rows");
 		timeBlockConfig.add(checkEmpty, 0, 2);
 		timeBlockConfig.add(rowHeightConfig, 0, 3);
 		timeBlockConfig.add(rowHeightConfigInput, 1, 3);
 		timeBlockConfig.add(timeBlockTitle, 0, 0);
-		
 
 		// ---
 		try {
@@ -894,12 +1244,12 @@ public class Main extends Application {
 			theme.setLayoutX(scene.getWidth() - 400);
 			theme.setLayoutY(10);
 			fontConfig.setLayoutX(scene.getWidth() - 400);
-			fontConfig.setLayoutY(scene.getHeight() - 250);
+			fontConfig.setLayoutY(scene.getHeight() - 190);
 			outPutGroup.setHgap(10);
 			outPutGroup.setLayoutX(scene.getWidth() - 300);
 			outPutGroup.setLayoutY(scene.getHeight() - 40);
-			timeBlockConfig.setLayoutX(scene.getWidth() - 400);
-			timeBlockConfig.setLayoutY(scene.getHeight() - 160);
+			timeBlockConfig.setLayoutX(scene.getWidth() - 210);
+			timeBlockConfig.setLayoutY(scene.getHeight() - 190);
 			primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");
@@ -909,7 +1259,53 @@ public class Main extends Application {
 		}
 	}
 
+	static Color cmykToRgb(ArrayList<Double> list) {
+		Color output;
+		double c = list.get(0);
+		double m = list.get(1);
+		double y = list.get(2);
+		double k = list.get(3);
+		double red = 255 * (1 - c) * (1 - k);
+		double green = 255 * (1 - m) * (1 - k);
+		double blue = 255 * (1 - y) * (1 - k);
+		int r = (int) red;
+		int g = (int) green;
+		int b = (int) blue;
+		output = Color.rgb(r, g, b);
+		return output;
+	}
+	
+	static Color cmykToRgb(double c, double m, double y, double k) {
+		Color output;
+		double red = 255 * (1 - c) * (1 - k);
+		double green = 255 * (1 - m) * (1 - k);
+		double blue = 255 * (1 - y) * (1 - k);
+		int r = (int) red;
+		int g = (int) green;
+		int b = (int) blue;
+		output = Color.rgb(r, g, b);
+		return output;
+	}
+
+	static ArrayList<Double> rgbToCmyk(Color color) {
+		ArrayList<Double> list = new ArrayList<Double>();
+		double r = color.getRed();
+		double g = color.getGreen();
+		double b = color.getBlue();
+		double max = Math.max(Math.max(r, g), b);
+		double k = 1 - max;
+		double c = (1 - r - k) / (1 - k);
+		double m = (1 - g - k) / (1 - k);
+		double y = (1 - b - k) / (1 - k);
+		list.add(c);
+		list.add(m);
+		list.add(y);
+		list.add(k);
+		return list;
+	}
+
 	public static void main(String[] args) {
 		launch(args);
+
 	}
 }

@@ -1,5 +1,6 @@
 package viffpdf;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class configSave implements Serializable {
 	double dc;
@@ -26,6 +27,14 @@ public class configSave implements Serializable {
 	double fm;
 	double fy;
 	double fk;
+	double oc;
+	double om;
+	double oy;
+	double ok;
+	double ec;
+	double em;
+	double ey;
+	double ek;
 	int vfs;
 	int mf;
 	public configSave() {};
@@ -35,6 +44,8 @@ public class configSave implements Serializable {
 										 double sColorc, double sColorm, double sColory, double sColork,
 										 double hColorc, double hColorm, double hColory, double hColork,
 										 double fColorc, double fColorm, double fColory, double fColork,
+										 double oColorc, double oColorm, double oColory, double oColork,
+										 double eColorc, double eColorm, double eColory, double eColork,
 					  int masterFont) {
 		vfs = venueFontSize;
 		mf = masterFont;
@@ -62,100 +73,66 @@ public class configSave implements Serializable {
 		fm = fColorm;
 		fy = fColory;
 		fk = fColork;
+		oc = oColorc;
+		om = oColorm;
+		oy = oColory;
+		ok = oColork;
+		ec = eColorc;
+		em = eColorm;
+		ey = eColork;
+		ek = eColork;
 	}
 	
-	void set(char type, char cmyk, double x) {
+	void set(char type, ArrayList<Double> list) {
 		switch (type){
 		case 'd':
-			switch (cmyk) {
-			case 'c':
-				dc = x;
-				return;
-			case 'm':
-				dm = x;
-				return;
-			case 'y':
-				dy = x;
-				return;
-			case 'k':
-				dk = x;
-				return;
-			}
+			dc = list.get(0);
+			dm = list.get(1);
+			dy = list.get(2);
+			dk = list.get(3);
+			break;
 		case 'b':
-			switch (cmyk) {
-			case 'c':
-				bc = x;
-				return;
-			case 'm':
-				bm = x;
-				return;
-			case 'y':
-				by = x;
-				return;
-			case 'k':
-				bk = x;
-				return;
-			}
+			bc = list.get(0);
+			bm = list.get(1);
+			by = list.get(2);
+			bk = list.get(3);
+			break;
 		case 'v':
-			switch (cmyk) {
-			case 'c':
-				vc = x;
-				return;
-			case 'm':
-				vm = x;
-				return;
-			case 'y':
-				vy = x;
-				return;
-			case 'k':
-				vk = x;
-				return;
-			}
+			vc = list.get(0);
+			vm = list.get(1);
+			vy = list.get(2);
+			vk = list.get(3);
+			break;
 		case 's':
-			switch (cmyk) {
-			case 'c':
-				sc = x;
-				return;
-			case 'm':
-				sm = x;
-				return;
-			case 'y':
-				sy = x;
-				return;
-			case 'k':
-				sk = x;
-				return;
-			}
+			sc = list.get(0);
+			sm = list.get(1);
+			sy = list.get(2);
+			sk = list.get(3);
+			break;
 		case 'h':
-			switch (cmyk) {
-			case 'c':
-				hc = x;
-				return;
-			case 'm':
-				hm = x;
-				return;
-			case 'y':
-				hy = x;
-				return;
-			case 'k':
-				hk = x;
-				return;
-			}
+			hc = list.get(0);
+			hm = list.get(1);
+			hy = list.get(2);
+			hk = list.get(3);
+			break;
 		case 'f':
-			switch (cmyk) {
-			case 'c':
-				fc = x;
-				return;
-			case 'm':
-				fm = x;
-				return;
-			case 'y':
-				fy = x;
-				return;
-			case 'k':
-				fk = x;
-				return;
-			}
+			fc = list.get(0);
+			fm = list.get(1);
+			fy = list.get(2);
+			fk = list.get(3);
+			break;
+		case 'o':
+			oc = list.get(0);
+			om = list.get(1);
+			oy = list.get(2);
+			ok = list.get(3);
+			break;
+		case 'e':
+			ec = list.get(0);
+			em = list.get(1);
+			ey = list.get(2);
+			ek = list.get(3);
+			break;
 		}
 	}
 	
@@ -167,59 +144,79 @@ public class configSave implements Serializable {
 		mf = font;
 	}
 	
-	public String getD() {
-		String s = null;
-		s = Double.toString(dc) + " ";
-		s += Double.toString(dm) + " ";
-		s += Double.toString(dy) + " ";
-		s += Double.toString(dk);
+	public ArrayList<Double> getD() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(dc);
+		s.add(dm);
+		s.add(dy);
+		s.add(dk);
 		return s;
 	}
 	
-	public String getB() {
-		String s = null;
-		s = Double.toString(bc) + " ";
-		s += Double.toString(bm) + " ";
-		s += Double.toString(by) + " ";
-		s += Double.toString(bk);
+	public ArrayList<Double> getB() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(bc);
+		s.add(bm);
+		s.add(by);
+		s.add(bk);
 		return s;
 	}
 	
-	public String getV() {
-		String s = null;
-		s = Double.toString(vc) + " ";
-		s += Double.toString(vm) + " ";
-		s += Double.toString(vy) + " ";
-		s += Double.toString(vk);
+	public ArrayList<Double> getH() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(hc);
+		s.add(hm);
+		s.add(hy);
+		s.add(hk);
 		return s;
 	}
 	
-	public String getS() {
-		String s = null;
-		s = Double.toString(sc) + " ";
-		s += Double.toString(sm) + " ";
-		s += Double.toString(sy) + " ";
-		s += Double.toString(sk);
+	public ArrayList<Double> getV() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(vc);
+		s.add(vm);
+		s.add(vy);
+		s.add(vk);
 		return s;
 	}
 	
-	public String getH() {
-		String s = null;
-		s = Double.toString(hc) + " ";
-		s += Double.toString(hm) + " ";
-		s += Double.toString(hy) + " ";
-		s += Double.toString(hk);
+	public ArrayList<Double> getS() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(sc);
+		s.add(sm);
+		s.add(sy);
+		s.add(sk);
 		return s;
 	}
 	
-	public String getF() {
-		String s = null;
-		s = Double.toString(fc) + " ";
-		s += Double.toString(fm) + " ";
-		s += Double.toString(fy) + " ";
-		s += Double.toString(fk);
+	public ArrayList<Double> getF() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(fc);
+		s.add(fm);
+		s.add(fy);
+		s.add(fk);
 		return s;
 	}
+	
+	public ArrayList<Double> getO() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(oc);
+		s.add(om);
+		s.add(oy);
+		s.add(ok);
+		return s;
+	}
+	
+	public ArrayList<Double> getE() {
+		ArrayList<Double> s = new ArrayList<Double>();
+		s.add(ec);
+		s.add(em);
+		s.add(ey);
+		s.add(ek);
+		return s;
+	}
+	
+
 }
 
 

@@ -51,6 +51,8 @@ public class PDFGenerator {
 	Color sColor;
 	Color hColor;
 	Color fColor;
+	Color oColor;
+	Color eColor;
 	int masterFont;
 	float rowHeight;
 	PdfFont font;
@@ -114,6 +116,8 @@ public class PDFGenerator {
 		sColor = config.sColor;
 		hColor = config.hColor;
 		fColor = config.fColor;
+		oColor = config.oColor;
+		eColor = config.eColor;
 		rowHeight = screenTimeList.get(0).thisHeight;
 		colorList = table.colorList;
 		sectionList = table.sectionList;
@@ -186,10 +190,10 @@ public class PDFGenerator {
 
 		float heightCounter = 0;
 		SolidBorder border = new SolidBorder(1.0f);
-		Border evenRightGrid = new DottedBorder(ColorConstants.GRAY, 0.5f, 1.0f);
-		Border evenLeftGrid = new DottedBorder(ColorConstants.GRAY, 0.85f, 1.0f);
-		Border oddRightGrid = new DottedBorder(ColorConstants.DARK_GRAY, 0.5f, 1.0f);
-		Border oddLeftGrid = new DottedBorder(ColorConstants.DARK_GRAY, 0.85f, 1.0f);
+		Border evenRightGrid = new DottedBorder(eColor, 0.5f, 1.0f);
+		Border evenLeftGrid = new DottedBorder(eColor, 0.85f, 1.0f);
+		Border oddRightGrid = new DottedBorder(oColor, 0.5f, 1.0f);
+		Border oddLeftGrid = new DottedBorder(oColor, 0.85f, 1.0f);
 
 		// Size of table in columns
 		int number_of_columns = 1080;
@@ -263,9 +267,9 @@ public class PDFGenerator {
 						emptyCell.setKeepTogether(true);
 
 						if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
-							emptyCell.setBackgroundColor(ColorConstants.GRAY);
+							emptyCell.setBackgroundColor(eColor);
 						} else {
-							emptyCell.setBackgroundColor(ColorConstants.DARK_GRAY);
+							emptyCell.setBackgroundColor(oColor);
 
 						}
 
@@ -293,9 +297,9 @@ public class PDFGenerator {
 					emptyCell.setKeepTogether(true);
 
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
-						emptyCell.setBackgroundColor(ColorConstants.GRAY);
+						emptyCell.setBackgroundColor(eColor);
 					} else {
-						emptyCell.setBackgroundColor(ColorConstants.DARK_GRAY);
+						emptyCell.setBackgroundColor(oColor);
 
 					}
 					emptyCell.setHeight(rowHeight);
@@ -397,9 +401,9 @@ public class PDFGenerator {
 					fillCell.setKeepTogether(true);
 
 					if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
-						fillCell.setBackgroundColor(ColorConstants.GRAY);
+						fillCell.setBackgroundColor(eColor);
 					} else {
-						fillCell.setBackgroundColor(ColorConstants.DARK_GRAY);
+						fillCell.setBackgroundColor(oColor);
 
 					}
 
@@ -445,9 +449,9 @@ public class PDFGenerator {
 				}
 				minCounter += 15;
 				if (table.venueSCTList.indexOf(vdt) % 2 == 0) {
-					fillCell.setBackgroundColor(ColorConstants.GRAY);
+					fillCell.setBackgroundColor(eColor);
 				} else {
-					fillCell.setBackgroundColor(ColorConstants.DARK_GRAY);
+					fillCell.setBackgroundColor(oColor);
 				}
 				// TODO use % 15 to draw dotted line for time grid.
 				schedule_table.addCell(fillCell);
