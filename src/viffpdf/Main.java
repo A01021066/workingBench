@@ -31,8 +31,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import com.itextpdf.kernel.colors.*;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -41,8 +39,6 @@ import javafx.stage.FileChooser;
 import javafx.scene.control.ColorPicker;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.awt.color.*;
 
 public class Main extends Application {
 	static Configuration config = null;
@@ -586,10 +582,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(dc.getText());
-					double m = Double.parseDouble(dm.getText());
-					double y = Double.parseDouble(dy.getText());
-					double k = Double.parseDouble(dk.getText());
+					double c = Double.parseDouble(dc.getText())/100;
+					double m = Double.parseDouble(dm.getText())/100;
+					double y = Double.parseDouble(dy.getText())/100;
+					double k = Double.parseDouble(dk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -598,10 +594,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(dc.getText()));
-					l.add(Double.parseDouble(dm.getText()));
-					l.add(Double.parseDouble(dy.getText()));
-					l.add(Double.parseDouble(dk.getText()));
+					l.add(Double.parseDouble(dc.getText())/100);
+					l.add(Double.parseDouble(dm.getText())/100);
+					l.add(Double.parseDouble(dy.getText())/100);
+					l.add(Double.parseDouble(dk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -619,10 +615,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(bc.getText());
-					double m = Double.parseDouble(bm.getText());
-					double y = Double.parseDouble(by.getText());
-					double k = Double.parseDouble(bk.getText());
+					double c = Double.parseDouble(bc.getText())/100;
+					double m = Double.parseDouble(bm.getText())/100;
+					double y = Double.parseDouble(by.getText())/100;
+					double k = Double.parseDouble(bk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -631,10 +627,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(bc.getText()));
-					l.add(Double.parseDouble(bm.getText()));
-					l.add(Double.parseDouble(by.getText()));
-					l.add(Double.parseDouble(bk.getText()));
+					l.add(Double.parseDouble(bc.getText())/100);
+					l.add(Double.parseDouble(bm.getText())/100);
+					l.add(Double.parseDouble(by.getText())/100);
+					l.add(Double.parseDouble(bk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -652,10 +648,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(vc.getText());
-					double m = Double.parseDouble(vm.getText());
-					double y = Double.parseDouble(vy.getText());
-					double k = Double.parseDouble(vk.getText());
+					double c = Double.parseDouble(vc.getText())/100;
+					double m = Double.parseDouble(vm.getText())/100;
+					double y = Double.parseDouble(vy.getText())/100;
+					double k = Double.parseDouble(vk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -664,10 +660,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(vc.getText()));
-					l.add(Double.parseDouble(vm.getText()));
-					l.add(Double.parseDouble(vy.getText()));
-					l.add(Double.parseDouble(vk.getText()));
+					l.add(Double.parseDouble(vc.getText())/100);
+					l.add(Double.parseDouble(vm.getText())/100);
+					l.add(Double.parseDouble(vy.getText())/100);
+					l.add(Double.parseDouble(vk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -685,10 +681,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(sc.getText());
-					double m = Double.parseDouble(sm.getText());
-					double y = Double.parseDouble(sy.getText());
-					double k = Double.parseDouble(sk.getText());
+					double c = Double.parseDouble(sc.getText())/100;
+					double m = Double.parseDouble(sm.getText())/100;
+					double y = Double.parseDouble(sy.getText())/100;
+					double k = Double.parseDouble(sk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -697,10 +693,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(sc.getText()));
-					l.add(Double.parseDouble(sm.getText()));
-					l.add(Double.parseDouble(sy.getText()));
-					l.add(Double.parseDouble(sk.getText()));
+					l.add(Double.parseDouble(sc.getText())/100);
+					l.add(Double.parseDouble(sm.getText())/100);
+					l.add(Double.parseDouble(sy.getText())/100);
+					l.add(Double.parseDouble(sk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -718,10 +714,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(hc.getText());
-					double m = Double.parseDouble(hm.getText());
-					double y = Double.parseDouble(hy.getText());
-					double k = Double.parseDouble(hk.getText());
+					double c = Double.parseDouble(hc.getText())/100;
+					double m = Double.parseDouble(hm.getText())/100;
+					double y = Double.parseDouble(hy.getText())/100;
+					double k = Double.parseDouble(hk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -730,10 +726,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(hc.getText()));
-					l.add(Double.parseDouble(hm.getText()));
-					l.add(Double.parseDouble(hy.getText()));
-					l.add(Double.parseDouble(hk.getText()));
+					l.add(Double.parseDouble(hc.getText())/100);
+					l.add(Double.parseDouble(hm.getText())/100);
+					l.add(Double.parseDouble(hy.getText())/100);
+					l.add(Double.parseDouble(hk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -751,10 +747,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-					double c = Double.parseDouble(fc.getText());
-					double m = Double.parseDouble(fm.getText());
-					double y = Double.parseDouble(fy.getText());
-					double k = Double.parseDouble(fk.getText());
+					double c = Double.parseDouble(fc.getText())/100;
+					double m = Double.parseDouble(fm.getText())/100;
+					double y = Double.parseDouble(fy.getText())/100;
+					double k = Double.parseDouble(fk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -763,10 +759,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(fc.getText()));
-					l.add(Double.parseDouble(fm.getText()));
-					l.add(Double.parseDouble(fy.getText()));
-					l.add(Double.parseDouble(fk.getText()));
+					l.add(Double.parseDouble(fc.getText())/100);
+					l.add(Double.parseDouble(fm.getText())/100);
+					l.add(Double.parseDouble(fy.getText())/100);
+					l.add(Double.parseDouble(fk.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -784,10 +780,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-				double c = Double.parseDouble(oc.getText());
-				double m = Double.parseDouble(om.getText());
-				double y = Double.parseDouble(oy.getText());
-				double k = Double.parseDouble(ok.getText());
+				double c = Double.parseDouble(oc.getText())/100;
+				double m = Double.parseDouble(om.getText())/100;
+				double y = Double.parseDouble(oy.getText())/100;
+				double k = Double.parseDouble(ok.getText())/100;
 				test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -796,10 +792,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(oc.getText()));
-					l.add(Double.parseDouble(om.getText()));
-					l.add(Double.parseDouble(oy.getText()));
-					l.add(Double.parseDouble(ok.getText()));
+					l.add(Double.parseDouble(oc.getText())/100);
+					l.add(Double.parseDouble(om.getText())/100);
+					l.add(Double.parseDouble(oy.getText())/100);
+					l.add(Double.parseDouble(ok.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -817,10 +813,10 @@ public class Main extends Application {
 			public void handle(ActionEvent event) {
 				Color test = null;
 				try {
-				double c = Double.parseDouble(ec.getText());
-				double m = Double.parseDouble(em.getText());
-				double y = Double.parseDouble(ey.getText());
-				double k = Double.parseDouble(ek.getText());
+				double c = Double.parseDouble(ec.getText())/100;
+				double m = Double.parseDouble(em.getText())/100;
+				double y = Double.parseDouble(ey.getText())/100;
+				double k = Double.parseDouble(ek.getText())/100;
 				test = cmykToRgb(c, m, y, k);
 				} catch (Exception e) {
 					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
@@ -829,10 +825,10 @@ public class Main extends Application {
 				}
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
-					l.add(Double.parseDouble(ec.getText()));
-					l.add(Double.parseDouble(em.getText()));
-					l.add(Double.parseDouble(ey.getText()));
-					l.add(Double.parseDouble(ek.getText()));
+					l.add(Double.parseDouble(ec.getText())/100);
+					l.add(Double.parseDouble(em.getText())/100);
+					l.add(Double.parseDouble(ey.getText())/100);
+					l.add(Double.parseDouble(ek.getText())/100);
 					float c1 = l.get(0).floatValue();
 					float m1 = l.get(1).floatValue();
 					float y1 = l.get(2).floatValue();
@@ -845,6 +841,21 @@ public class Main extends Application {
 		});
 
 		theme.add(themeTitle, 0, 0);
+		Text cLabel = new Text("      c");
+		cLabel.setStyle("-fx-font-weight: bold");
+		theme.add(cLabel, 2, 0);
+		
+		Text mLabel = new Text("      m");
+		mLabel.setStyle("-fx-font-weight: bold");
+		theme.add(mLabel, 3, 0);
+		
+		Text yLabel = new Text("      y");
+		yLabel.setStyle("-fx-font-weight: bold");
+		theme.add(yLabel, 4, 0);
+		
+		Text kLabel = new Text("      k");
+		kLabel.setStyle("-fx-font-weight: bold");
+		theme.add(kLabel, 5, 0);
 
 		theme.add(dayHeader, 0, 1);
 		theme.add(dayPicker, 1, 1);
@@ -1056,7 +1067,10 @@ public class Main extends Application {
 				config = new Configuration(sizeBox.getValue(), dColorConfig, bColorConfig, vColorConfig, sColorConfig,
 						hColorConfig, fColorConfig, oColorConfig, eColorConfig, masterFont);
 				try {
-					PDFGenerator generator = new PDFGenerator(System.getProperty("user.dir").toString() + "/viffpdf",
+					FileChooser fileChooser = new FileChooser();
+					File dest = fileChooser.showSaveDialog(primaryStage);
+					
+					PDFGenerator generator = new PDFGenerator(dest.getAbsolutePath(),
 							table, config);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -1091,8 +1105,14 @@ public class Main extends Application {
 					file.close();
 
 				} catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					return;
+				}	catch (NullPointerException e) {
+					Status.print("Saving cancelled.");
+					//e.printStackTrace();
+					return;
 				}
+				Status.print("Setting saving successful.");
 			}
 
 		});
@@ -1105,7 +1125,6 @@ public class Main extends Application {
 				try {
 					final FileChooser fileChooser = new FileChooser();
 					File dest = fileChooser.showOpenDialog(primaryStage);
-					
 					FileInputStream file = new FileInputStream(dest.getAbsolutePath());
 					ObjectInputStream in = new ObjectInputStream(file);
 					configSave temp = (configSave) in.readObject();
@@ -1193,10 +1212,18 @@ public class Main extends Application {
 
 
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					return;
 				} catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					return;
+				} catch (NullPointerException e) {
+					Status.print("Loading cancelled.");
+					//e.printStackTrace();
+					return;
 				}
+				
+				Status.print("Setting loading successful.");
 			}
 
 		});

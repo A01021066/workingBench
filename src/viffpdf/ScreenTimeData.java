@@ -77,6 +77,7 @@ public class ScreenTimeData extends RowData {
 			startBlock = this.getStartTime() - 570; // 9:30 in minutes;
 			venueCode = data.get(7);
 			pageNum = data.get(8);
+			//new column
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException(
 					"Rows must be in format " + "{date, movieName, movieId, length(minutes), "
