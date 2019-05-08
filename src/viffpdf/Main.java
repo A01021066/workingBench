@@ -1081,7 +1081,10 @@ public class Main extends Application {
 				saveFile.setFont(fonts.indexOf(fontBox.getValue()));
 				saveFile.setFontSize(sizeBox.getValue());
 				try {
-					FileOutputStream file = new FileOutputStream("save.ser");
+					final FileChooser fileChooser = new FileChooser();
+					File dest = fileChooser.showSaveDialog(primaryStage);
+					
+					FileOutputStream file = new FileOutputStream(dest.getAbsolutePath());
 					ObjectOutputStream out = new ObjectOutputStream(file);
 					out.writeObject(saveFile);
 					out.close();
@@ -1100,7 +1103,10 @@ public class Main extends Application {
 			public void handle(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				try {
-					FileInputStream file = new FileInputStream("save.ser");
+					final FileChooser fileChooser = new FileChooser();
+					File dest = fileChooser.showOpenDialog(primaryStage);
+					
+					FileInputStream file = new FileInputStream(dest.getAbsolutePath());
 					ObjectInputStream in = new ObjectInputStream(file);
 					configSave temp = (configSave) in.readObject();
 
