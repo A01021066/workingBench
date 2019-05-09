@@ -27,14 +27,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.scene.control.ColorPicker;
 import javafx.stage.Modality;
@@ -65,7 +73,7 @@ public class Main extends Application {
 	static Text sectionStat;
 	static Text venueStat;
 	static Text screenTimeStat;
-	static TextArea logArea;
+	static TextFlow logArea;
 	static RadioButton checkEmpty;
 	static int masterFont;
 	static File colorTab;
@@ -105,15 +113,16 @@ public class Main extends Application {
 			try {
 				Parser parser = parsers.get(fileType);
 				Status.print("Loading: " + parser.getFileType());
-				Status.print(parser.setData(file) + parser.getFileType() + " file opened properly!");
+				Status.printWarning(parser.setData(file)); //prints any warnings
+				Status.print(parser.getFileType() + " file opened properly!");
 				fileStats.get(fileType).setText("Passed");
 			} catch (FileNotFoundException e) {
-				Status.print("File Not Found.  Details:");
-				Status.print(e.getMessage());
+				Status.printError("File Not Found.  Details:");
+				Status.printError(e.getMessage());
 				fileStats.get(fileType).setText("Failed");
 			} catch (IllegalArgumentException e) {
-				Status.print("File Not Valid.  Details:");
-				Status.print(e.getMessage());
+				Status.printError("File Not Valid.  Details:");
+				Status.printError(e.getMessage());
 				fileStats.get(fileType).setText("Failed");
 			} finally {
 				// fOpenPns.get(fileType).setText(file.getName());
@@ -121,7 +130,7 @@ public class Main extends Application {
 
 			// Cancels file opening.
 		} else {
-			Status.print("File Open Cancelled.");
+			Status.printError("File Open Cancelled.");
 		}
 
 	}
@@ -587,9 +596,8 @@ public class Main extends Application {
 					double y = Double.parseDouble(dy.getText())/100;
 					double k = Double.parseDouble(dk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
+				} catch (NumberFormatException e) {
+				    Status.printError("Please fill in all of the fields for cmyk.");
 					return;
 				}
 				if (test != null) {
@@ -620,11 +628,10 @@ public class Main extends Application {
 					double y = Double.parseDouble(by.getText())/100;
 					double k = Double.parseDouble(bk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(bc.getText())/100);
@@ -653,11 +660,10 @@ public class Main extends Application {
 					double y = Double.parseDouble(vy.getText())/100;
 					double k = Double.parseDouble(vk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(vc.getText())/100);
@@ -686,11 +692,10 @@ public class Main extends Application {
 					double y = Double.parseDouble(sy.getText())/100;
 					double k = Double.parseDouble(sk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(sc.getText())/100);
@@ -719,11 +724,10 @@ public class Main extends Application {
 					double y = Double.parseDouble(hy.getText())/100;
 					double k = Double.parseDouble(hk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(hc.getText())/100);
@@ -752,11 +756,10 @@ public class Main extends Application {
 					double y = Double.parseDouble(fy.getText())/100;
 					double k = Double.parseDouble(fk.getText())/100;
 					test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(fc.getText())/100);
@@ -785,11 +788,10 @@ public class Main extends Application {
 				double y = Double.parseDouble(oy.getText())/100;
 				double k = Double.parseDouble(ok.getText())/100;
 				test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(oc.getText())/100);
@@ -818,11 +820,10 @@ public class Main extends Application {
 				double y = Double.parseDouble(ey.getText())/100;
 				double k = Double.parseDouble(ek.getText())/100;
 				test = cmykToRgb(c, m, y, k);
-				} catch (Exception e) {
-					Status.print("Invalid cmyk input value. Please use numbers between 0 and 1. \nPlease don't leave"
-							+ "any space empty.");
-					return;
-				}
+				} catch (NumberFormatException e) {
+                    Status.printError("Please fill in all of the fields for cmyk.");
+                    return;
+                }
 				if (test != null) {
 					ArrayList<Double> l = new ArrayList<Double>();
 					l.add(Double.parseDouble(ec.getText())/100);
@@ -922,20 +923,26 @@ public class Main extends Application {
 		theme.add(eB, 6, 8);
 
 		// ---
-		GridPane log = new GridPane();
+		FlowPane log = new FlowPane();
 		log.setVgap(10);
 		log.setHgap(10);
+		
+		ScrollPane logWrapper = new ScrollPane();
 
 		Text logTitle = new Text("Status: ");
 		logTitle.setStyle("-fx-font-weight: bold");
 
-		logArea = new TextArea();
-		logArea.setEditable(false);
+		logArea = new TextFlow();
+//		logArea.setEditable(false);
 		logArea.setPrefHeight(355);
 		logArea.setPrefWidth(450);
+		
+		logWrapper.setContent(logArea);
+	    logWrapper.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, 
+	                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
-		log.add(logTitle, 1, 0);
-		log.add(logArea, 1, 1);
+		log.getChildren().add(logTitle);
+		log.getChildren().add(logWrapper);
 
 		// ---Font configurations
 		// ---
@@ -1108,7 +1115,7 @@ public class Main extends Application {
 					//e.printStackTrace();
 					return;
 				}	catch (NullPointerException e) {
-					Status.print("Saving cancelled.");
+					Status.printError("Saving cancelled.");
 					//e.printStackTrace();
 					return;
 				}
@@ -1218,7 +1225,7 @@ public class Main extends Application {
 					//e.printStackTrace();
 					return;
 				} catch (NullPointerException e) {
-					Status.print("Loading cancelled.");
+					Status.printError("Loading cancelled.");
 					//e.printStackTrace();
 					return;
 				}
@@ -1277,12 +1284,12 @@ public class Main extends Application {
 			theme.setLayoutX(scene.getWidth() - 400);
 			theme.setLayoutY(10);
 			fontConfig.setLayoutX(scene.getWidth() - 400);
-			fontConfig.setLayoutY(scene.getHeight() - 190);
+			fontConfig.setLayoutY(scene.getHeight() - 150);
 			outPutGroup.setHgap(10);
 			outPutGroup.setLayoutX(scene.getWidth() - 300);
 			outPutGroup.setLayoutY(scene.getHeight() - 40);
 			timeBlockConfig.setLayoutX(scene.getWidth() - 210);
-			timeBlockConfig.setLayoutY(scene.getHeight() - 190);
+			timeBlockConfig.setLayoutY(scene.getHeight() - 150);
 			primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");
@@ -1310,6 +1317,10 @@ public class Main extends Application {
 	
 	static Color cmykToRgb(double c, double m, double y, double k) {
 		Color output;
+		if (c > 1 || m > 1 || y > 1 || k > 1) {
+		    Status.printError("Please only use value between 0 and 100 for cmyk.");
+		    return null;
+		}
 		double red = 255 * (1 - c) * (1 - k);
 		double green = 255 * (1 - m) * (1 - k);
 		double blue = 255 * (1 - y) * (1 - k);
