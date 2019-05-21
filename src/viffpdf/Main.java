@@ -1,3 +1,9 @@
+/**@author Louis Liu
+ *
+ * In case you need it (you will) 
+ * you can email me at nacuoyelihwkcabnrut@hotmail.com
+ */
+
 package viffpdf;
 
 import java.io.File;
@@ -67,8 +73,11 @@ public class Main extends Application {
 	static com.itextpdf.kernel.colors.Color hColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
 	static com.itextpdf.kernel.colors.Color oColorConfig = com.itextpdf.kernel.colors.ColorConstants.GRAY;
 	static com.itextpdf.kernel.colors.Color eColorConfig = com.itextpdf.kernel.colors.ColorConstants.DARK_GRAY;
+	static ArrayList<NumField> daysPerPageInput = new ArrayList<NumField>();
+	
 
-	static TextField rowHeightConfigInput = new TextField("13.1");
+
+	static TextField rowHeightConfigInput = new TextField("13");
 	static Text colorStat;
 	static Text sectionStat;
 	static Text venueStat;
@@ -80,13 +89,13 @@ public class Main extends Application {
 	static File sectionTab;
 	static File venueTab;
 	static File screenTimeTab;
-	static int[] pageLayoutSetting = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	static int[] pageLayoutSetting = { 4, 4, 4, 4, 4, 4, 4, 4 };
 	static boolean[] emptyRowSetting = { false, false, false, false, false, false, false, false };
-	ArrayList<VenueTable> VTList = new ArrayList<VenueTable>();
-	ArrayList<VenueDateTable> VDTList = new ArrayList<VenueDateTable>();
-	ArrayList<DayTable> DList = new ArrayList<DayTable>();
-	ArrayList<PageTable> PList = new ArrayList<PageTable>();
-	ArrayList<Date> dateList = new ArrayList<Date>();
+//	ArrayList<VenueTable> VTList = new ArrayList<VenueTable>();
+//	ArrayList<VenueDateTable> VDTList = new ArrayList<VenueDateTable>();
+//	ArrayList<DayTable> DList = new ArrayList<DayTable>();
+//	ArrayList<PageTable> PList = new ArrayList<PageTable>();
+//	ArrayList<Date> dateList = new ArrayList<Date>();
 	HashMap<String, ColorData> colorList;
 	TreeMap<String, SectionData> sectionList;
 	private ArrayList<Button> fileTypes = new ArrayList<Button>(4);
@@ -139,14 +148,11 @@ public class Main extends Application {
 		GridPane pageSettingLayOut = new GridPane();
 		pageSettingLayOut.setHgap(10);
 		pageSettingLayOut.setVgap(10);
-		Scene pageSettingScene = new Scene(pageSettingLayOut, 400, 400);
+		Scene pageSettingScene = new Scene(pageSettingLayOut, 300, 400);
 		Text pageNumberText = new Text("Page#");
 		pageNumberText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 		Text daysPerPageText = new Text("Days/Page");
 		daysPerPageText.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
-		Text emptyRowText = new Text("Clear Empty Venue");
-		emptyRowText.setFont(Font.font("Verdana", FontWeight.BOLD, 10));
-		pageSettingLayOut.add(emptyRowText, 8, 1);
 		pageSettingLayOut.add(daysPerPageText, 6, 1);
 		pageSettingLayOut.add(pageNumberText, 1, 1);
 		for (int i = 2; i < 10; i++) {
@@ -154,7 +160,7 @@ public class Main extends Application {
 			text.setTextAlignment(TextAlignment.CENTER);
 			pageSettingLayOut.add(text, 1, i);
 		}
-		ArrayList<NumField> daysPerPageInput = new ArrayList<NumField>();
+		daysPerPageInput = new ArrayList<NumField>();
 		String[] varNames = { "page1", "page2", "page3", "page4", "page5", "page6", "page7", "page8" };
 		for (int n = 2; n < 10; n++) {
 			NumField textField = new NumField();
@@ -165,14 +171,7 @@ public class Main extends Application {
 			daysPerPageInput.add(textField);
 		}
 
-		ArrayList<RadioButton> emptyRows = new ArrayList<RadioButton>();
-		String[] radioNames = { "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8" };
-		for (int n = 2; n < 10; n++) {
-			RadioButton radio = new RadioButton();
-			radio.setId(radioNames[n - 2]);
-			pageSettingLayOut.add(radio, 8, n);
-			emptyRows.add(radio);
-		}
+
 
 		Button applyPageSetting = new Button("Apply");
 		applyPageSetting.setOnAction(new EventHandler<ActionEvent>() {
@@ -184,10 +183,6 @@ public class Main extends Application {
 						n.setText("0");
 					}
 					pageLayoutSetting[daysPerPageInput.indexOf(n)] = Integer.parseInt(n.getText());
-				}
-
-				for (RadioButton r : emptyRows) {
-					emptyRowSetting[emptyRows.indexOf(r)] = r.isSelected();
 				}
 				Status.print("Days/page setting successfully applied.");
 				int counter = 1;
@@ -216,6 +211,7 @@ public class Main extends Application {
 
 	@SuppressWarnings("rawtypes")
 	public void start(Stage primaryStage) {
+
 
 		parsers.add(SECTIONS, new SectionParser());
 		parsers.add(COLORS, new ColorParser());
@@ -924,8 +920,6 @@ public class Main extends Application {
 
 		// ---
 		FlowPane log = new FlowPane();
-		log.setVgap(10);
-		log.setHgap(10);
 		
 		ScrollPane logWrapper = new ScrollPane();
 
@@ -933,9 +927,9 @@ public class Main extends Application {
 		logTitle.setStyle("-fx-font-weight: bold");
 
 		logArea = new TextFlow();
-//		logArea.setEditable(false);
 		logArea.setPrefHeight(355);
 		logArea.setPrefWidth(450);
+		
 		
 		logWrapper.setContent(logArea);
 	    logWrapper.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, 
@@ -979,9 +973,9 @@ public class Main extends Application {
 		// ---Output buttons
 		// ---
 		GridPane outPutGroup = new GridPane();
-		Button save = new Button("Save");
-		Button load = new Button("Load");
-		Button export = new Button("Generate");
+		Button save = new Button("Save Setting");
+		Button load = new Button("Load Setting");
+		Button export = new Button("Create PDF");
 		export.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -990,6 +984,12 @@ public class Main extends Application {
 				 * cases.
 				 */
 
+				ArrayList<VenueTable> VTList = new ArrayList<VenueTable>();
+				ArrayList<VenueDateTable> VDTList = new ArrayList<VenueDateTable>();
+				ArrayList<DayTable> DList = new ArrayList<DayTable>();
+				ArrayList<PageTable> PList = new ArrayList<PageTable>();
+				ArrayList<Date> dateList = new ArrayList<Date>();
+				
 				// get the Venue datas from the VenueParser.
 				HashMap<String, VenueData> venueList = ((VenueParser) parsers.get(2)).getVenueList();
 				colorList = ((ColorParser) parsers.get(1)).getColorMap();
@@ -1079,18 +1079,14 @@ public class Main extends Application {
 					
 					PDFGenerator generator = new PDFGenerator(dest.getAbsolutePath(),
 							table, config);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
+					Status.print("PDF creation failed. Please close opened PDF file if you're trying to override it.");
 				}
 
 				PageTable.dayCount = 0;
 				PageTable.pageCount = 1;
 				DayTable.count = 0;
-				VTList = new ArrayList<VenueTable>();
-				VDTList = new ArrayList<VenueDateTable>();
-				DList = new ArrayList<DayTable>();
-				PList = new ArrayList<PageTable>();
-				dateList = new ArrayList<Date>();
 			}
 		});
 
@@ -1254,7 +1250,7 @@ public class Main extends Application {
 		GridPane timeBlockConfig = new GridPane();
 		timeBlockConfig.setHgap(10);
 		timeBlockConfig.setVgap(10);
-		Text rowHeightConfig = new Text("Max Row Height: ");
+		Text rowHeightConfig = new Text("Max Row Height:\n(13 recommended) ");
 
 		rowHeightConfigInput.setPrefWidth(150);
 		Text timeBlockTitle = new Text("Line:");
@@ -1275,27 +1271,29 @@ public class Main extends Application {
 			root.getChildren().add(fontConfig);
 			root.getChildren().add(outPutGroup);
 			root.getChildren().add(timeBlockConfig);
-
 			Scene scene = new Scene(root, 1000, 500);
-			loaderGroup.setLayoutX(10);
-			loaderGroup.setLayoutY(10);
-			log.setLayoutX(10);
-			log.setLayoutY(scene.getHeight() - 400);
-			theme.setLayoutX(scene.getWidth() - 400);
-			theme.setLayoutY(10);
-			fontConfig.setLayoutX(scene.getWidth() - 400);
-			fontConfig.setLayoutY(scene.getHeight() - 150);
+			primaryStage.show();
+			loaderGroup.setLayoutX(primaryStage.getWidth() * 0.01);
+			loaderGroup.setLayoutY(primaryStage.getHeight() * 0.005);
+			log.setLayoutX(primaryStage.getWidth() * 0.02);
+			log.setLayoutY(primaryStage.getHeight() * 0.15);
+			theme.setLayoutX(primaryStage.getWidth() * 0.6);
+			theme.setLayoutY(primaryStage.getHeight() * 0.01);
+			fontConfig.setLayoutX(primaryStage.getWidth() * 0.6);
+			fontConfig.setLayoutY(primaryStage.getHeight() * 0.5);
 			outPutGroup.setHgap(10);
-			outPutGroup.setLayoutX(scene.getWidth() - 300);
-			outPutGroup.setLayoutY(scene.getHeight() - 40);
-			timeBlockConfig.setLayoutX(scene.getWidth() - 210);
-			timeBlockConfig.setLayoutY(scene.getHeight() - 150);
-			primaryStage.setResizable(false);
+			outPutGroup.setLayoutX(primaryStage.getWidth() * 0.6);
+			outPutGroup.setLayoutY(primaryStage.getHeight() * 0.7);
+			timeBlockConfig.setLayoutX(primaryStage.getWidth() * 0.79);
+			timeBlockConfig.setLayoutY(primaryStage.getHeight() * 0.5);
+			//primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");
-			primaryStage.show();
+
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			return;
 		}
 	}
 

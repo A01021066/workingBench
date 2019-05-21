@@ -2,6 +2,7 @@ package viffpdf;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**the save and load file**/
 public class configSave implements Serializable {
 	double dc;
 	double dm;
