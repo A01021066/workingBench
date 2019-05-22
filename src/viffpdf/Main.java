@@ -1,7 +1,5 @@
 /**@author Louis Liu
  *
- * In case you need it (you will) 
- * you can email me at nacuoyelihwkcabnrut@hotmail.com
  */
 
 package viffpdf;
@@ -63,16 +61,16 @@ public class Main extends Application {
 	static javafx.scene.paint.Color sColor = Color.rgb(255, 255, 255);
 	static javafx.scene.paint.Color hColor = Color.rgb(255, 255, 255);
 	static javafx.scene.paint.Color fColor = Color.rgb(0, 0, 0);
-	static javafx.scene.paint.Color oColor = Color.GRAY;
-	static javafx.scene.paint.Color eColor = Color.DARKGRAY;
+	static javafx.scene.paint.Color oColor = Color.rgb(211, 211, 211);
+	static javafx.scene.paint.Color eColor = Color.rgb(128, 128, 128);
 	static com.itextpdf.kernel.colors.Color dColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color bColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color vColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 165, 0);
 	static com.itextpdf.kernel.colors.Color sColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
 	static com.itextpdf.kernel.colors.Color fColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(0, 0, 0);
 	static com.itextpdf.kernel.colors.Color hColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(255, 255, 255);
-	static com.itextpdf.kernel.colors.Color oColorConfig = com.itextpdf.kernel.colors.ColorConstants.GRAY;
-	static com.itextpdf.kernel.colors.Color eColorConfig = com.itextpdf.kernel.colors.ColorConstants.DARK_GRAY;
+	static com.itextpdf.kernel.colors.Color oColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(211, 211, 211);
+	static com.itextpdf.kernel.colors.Color eColorConfig = new com.itextpdf.kernel.colors.DeviceRgb(128, 128, 128);
 	static ArrayList<NumField> daysPerPageInput = new ArrayList<NumField>();
 	
 
@@ -1273,19 +1271,19 @@ public class Main extends Application {
 			root.getChildren().add(timeBlockConfig);
 			Scene scene = new Scene(root, 1000, 500);
 			primaryStage.show();
-			loaderGroup.setLayoutX(primaryStage.getWidth() * 0.01);
-			loaderGroup.setLayoutY(primaryStage.getHeight() * 0.005);
-			log.setLayoutX(primaryStage.getWidth() * 0.02);
-			log.setLayoutY(primaryStage.getHeight() * 0.15);
-			theme.setLayoutX(primaryStage.getWidth() * 0.6);
-			theme.setLayoutY(primaryStage.getHeight() * 0.01);
-			fontConfig.setLayoutX(primaryStage.getWidth() * 0.6);
-			fontConfig.setLayoutY(primaryStage.getHeight() * 0.5);
+			loaderGroup.setLayoutX(primaryStage.getWidth() - 950);
+			loaderGroup.setLayoutY(primaryStage.getHeight() - 590);
+			log.setLayoutX(primaryStage.getWidth() - 940);
+			log.setLayoutY(primaryStage.getHeight() - 500);
+			theme.setLayoutX(primaryStage.getWidth() - 400);
+			theme.setLayoutY(primaryStage.getHeight() - 590);
+			fontConfig.setLayoutX(primaryStage.getWidth() - 400);
+			fontConfig.setLayoutY(primaryStage.getHeight() - 280);
 			outPutGroup.setHgap(10);
-			outPutGroup.setLayoutX(primaryStage.getWidth() * 0.6);
-			outPutGroup.setLayoutY(primaryStage.getHeight() * 0.7);
-			timeBlockConfig.setLayoutX(primaryStage.getWidth() * 0.79);
-			timeBlockConfig.setLayoutY(primaryStage.getHeight() * 0.5);
+			outPutGroup.setLayoutX(primaryStage.getWidth() - 400);
+			outPutGroup.setLayoutY(primaryStage.getHeight() - 150);
+			timeBlockConfig.setLayoutX(primaryStage.getWidth() - 200);
+			timeBlockConfig.setLayoutY(primaryStage.getHeight() - 280);
 			//primaryStage.setResizable(false);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle("VIFF-PDF Generator");
